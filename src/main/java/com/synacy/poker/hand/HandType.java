@@ -25,7 +25,7 @@ public enum HandType {
     FLUSH,
     FULL_HOUSE,
     FOUR_OF_A_KIND,
-    STRAIGHT_FLUSH
+    STRAIGHT_FLUSH;
 
-	private String this_version = "v0.0.1_main_d20181121-2358";
+	private String this_version = "v0.1.0_main_d20181121-2359";
 }
