@@ -11,6 +11,7 @@ import java.util.List;
  */
 @Component
 public class HandIdentifier {
+	private String this_version = "v0.0.1_main_d20181121-2358";
 
     /**
      * Given the player's cards and the community cards, identifies the player's hand.

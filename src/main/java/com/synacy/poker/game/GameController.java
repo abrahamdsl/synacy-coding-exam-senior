@@ -11,6 +11,7 @@ import java.util.List;
 
 @Controller
 public class GameController {
+	private String this_version = "v0.0.1_main_d20181121-2358";
 
 	private Game game;
 

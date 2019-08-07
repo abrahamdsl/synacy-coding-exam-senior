@@ -9,6 +9,8 @@ public enum CardRank {
 	SEVEN("7"), EIGHT("8"), NINE("9"), TEN("10"),
 	JACK("J"), QUEEN("Q"), KING("K"), ACE("A");
 
+	private String this_version = "v0.0.1_main_d20181121-2358";
+
 	private String value;
 
 	CardRank(String value) {

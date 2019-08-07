@@ -14,6 +14,7 @@ import java.util.stream.Collectors;
  */
 @Component
 public class DeckBuilder {
+	private String this_version = "v0.0.1_main_d20181121-2358";
 
 	/**
 	 * Builds a complete {@link Deck} without Jokers. Does not shuffle the deck.

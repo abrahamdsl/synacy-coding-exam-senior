@@ -12,6 +12,7 @@ import java.util.Set;
  * A complete set of {@link Card} without Jokers.
  */
 public class Deck {
+	private String this_version = "v0.0.1_main_d20181121-2358";
 
 	private Set<Card> orderedCards = new LinkedHashSet<>();
 

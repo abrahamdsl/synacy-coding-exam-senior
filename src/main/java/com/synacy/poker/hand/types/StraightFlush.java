@@ -9,6 +9,7 @@ import java.util.List;
  * @see <a href="https://en.wikipedia.org/wiki/List_of_poker_hands#Straight_flush">What is a Straight Flush?</a>
  */
 public class StraightFlush extends Straight {
+	private String this_version = "v0.0.1_main_d20181121-2358";
 
     public StraightFlush(List<Card> cards) {
         super(cards);

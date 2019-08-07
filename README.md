@@ -1,5 +1,7 @@
 # Texas Hold'em Poker Simulator
 
+# private String this_version = "v0.0.1_main_d20181121-2358";
+
 This exercise is based on the [Texas Hold'em](https://en.wikipedia.org/wiki/Texas_hold_%27em) variant of the Poker card game.
 
 Please read up on the rules of this game beforehand to become familiar with them, or watch this 

@@ -11,6 +11,7 @@ import java.util.Arrays;
 import static org.junit.Assert.assertEquals;
 
 public class DeckTest {
+	private String this_version = "v0.0.1_main_d20181121-2358";
 
 	private Deck deck;
 

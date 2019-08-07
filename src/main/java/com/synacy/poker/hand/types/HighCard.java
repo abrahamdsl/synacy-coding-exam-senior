@@ -10,6 +10,7 @@ import java.util.List;
  * @see <a href="https://en.wikipedia.org/wiki/List_of_poker_hands#High_card">What is a High Card?</a>
  */
 public class HighCard extends Hand {
+	private String this_version = "v0.0.1_main_d20181121-2358";
 
     private List<Card> cards;
 

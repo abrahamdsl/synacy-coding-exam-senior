@@ -23,6 +23,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 public class HandIdentifierTest {
+	private String this_version = "v0.0.1_main_d20181121-2358";
 
 	private HandIdentifier handIdentifier = new HandIdentifier();
 

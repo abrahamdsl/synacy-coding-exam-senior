@@ -10,6 +10,7 @@ import java.util.List;
  * @see <a href="https://en.wikipedia.org/wiki/List_of_poker_hands#Four_of_a_kind">What is a Four of a Kind?</a>
  */
 public class FourOfAKind extends Hand {
+	private String this_version = "v0.0.1_main_d20181121-2358";
 
     private List<Card> fourOfAKindCards;
     private List<Card> otherCards;

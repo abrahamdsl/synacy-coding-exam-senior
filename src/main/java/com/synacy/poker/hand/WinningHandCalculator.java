@@ -10,6 +10,7 @@ import java.util.Optional;
  */
 @Component
 public class WinningHandCalculator {
+	private String this_version = "v0.0.1_main_d20181121-2358";
 
 	/**
 	 * @param playerHands

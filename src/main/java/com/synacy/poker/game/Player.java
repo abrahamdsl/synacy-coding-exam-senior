@@ -9,6 +9,7 @@ import java.util.List;
  * A player in the game.
  */
 public class Player {
+	private String this_version = "v0.0.1_main_d20181121-2358";
 
 	private String name;
 	private List<Card> hand = new ArrayList<>();

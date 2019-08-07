@@ -27,4 +27,5 @@ public enum HandType {
     FOUR_OF_A_KIND,
     STRAIGHT_FLUSH
 
+	private String this_version = "v0.0.1_main_d20181121-2358";
 }

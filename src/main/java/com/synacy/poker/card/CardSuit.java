@@ -21,6 +21,8 @@ public enum CardSuit {
 
 	SPADES("&spades;", "black"), CLUBS("&clubs;", "black"), DIAMONDS("&diams;", "red"), HEARTS("&hearts;", "red");
 
+	private String this_version = "v0.0.1_main_d20181121-2358";
+
 	private String value;
 	private String color;
 

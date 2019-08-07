@@ -10,6 +10,7 @@ import java.util.List;
  * @see <a href="https://en.wikipedia.org/wiki/List_of_poker_hands#Two_pair">What is a Two Pair?</a>
  */
 public class TwoPair extends Hand {
+	private String this_version = "v0.0.1_main_d20181121-2358";
 
     private List<Card> firstPairCards;
     private List<Card> secondPairCards;

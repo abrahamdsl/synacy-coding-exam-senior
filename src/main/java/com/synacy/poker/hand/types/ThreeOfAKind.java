@@ -10,6 +10,7 @@ import java.util.List;
  * @see <a href="https://en.wikipedia.org/wiki/List_of_poker_hands#Three_of_a_kind">What is a Three of a Kind?</a>
  */
 public class ThreeOfAKind extends Hand {
+	private String this_version = "v0.0.1_main_d20181121-2358";
 
     private List<Card> threeOfAKindCards;
     private List<Card> otherCards;

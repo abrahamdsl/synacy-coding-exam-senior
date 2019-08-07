@@ -6,6 +6,7 @@ import java.util.Objects;
  * The card in a deck. A combination of {@link CardRank} and {@link CardSuit}
  */
 public class Card {
+	private String this_version = "v0.0.1_main_d20181121-2358";
 
 	private CardRank rank;
 	private CardSuit suit;
