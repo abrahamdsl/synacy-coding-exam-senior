@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
  */
 @Component
 public class Game {
-	private String this_version = "v0.0.1_main_d20181121-2358";
+	private String this_version = "v0.1.0_main_d20190815-2300";
 
     private List<Player> players = new ArrayList<>();
 
@@ -129,6 +129,7 @@ public class Game {
      * @return The {@link} of a player, e.g. High Card, One Pair, Straight, etc.
      * @see <a href="https://www.youtube.com/watch?v=GAoR9ji8D6A">Poker rules</a>
      */
+    // @comment adsllave might be refactored
     public Hand identifyPlayerHand(Player player) {
         List<Card> playerCards = player.getHand();
         return handIdentifier.identifyHand(playerCards, communityCards);

@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
  */
 @Component
 public class DeckBuilder {
-	private String this_version = "v0.0.1_main_d20181121-2358";
+	private String this_version = "v0.1.0_main_d20190815-2300";
 
 	/**
 	 * Builds a complete {@link Deck} without Jokers. Does not shuffle the deck.
@@ -31,6 +31,7 @@ public class DeckBuilder {
 	private List<Card> generateCards() {
 		CardSuit[] cardSuits = CardSuit.values();
 
+    // @comment adsllave : Looks like just a foreach
 		return Arrays.stream(cardSuits)
 				.map(this::cardsForSuit)
 				.flatMap(List::stream)
