@@ -4,7 +4,8 @@ package com.synacy.poker.card;
  * A blank card. Also, the back side of the card.
  */
 public class BlankCard extends Card {
-	String this_version = "v0.0.1_main_d20181121-2358";
+	private String this_version = "v0.1.0_main_d20190822-2358";
+	// @changelog : Just added 'end class'
 
 	public BlankCard() {
 		super(null, null);
@@ -24,4 +25,4 @@ public class BlankCard extends Card {
 		return "&nbsp;";
 	}
 
-}
+} // end class BlankCard

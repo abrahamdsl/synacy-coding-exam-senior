@@ -12,7 +12,8 @@ import java.util.List;
 import static org.junit.Assert.assertEquals;
 
 public class FullHouseTest {
-	private String this_version = "v0.0.1_main_d20181121-2358";
+    private String this_version = "v0.1.0_main_d20190822-2358";
+    // @changelog : Just added 'end class' indicator
 
     @Test
     public void toString_withFullHouse() {
@@ -31,4 +32,4 @@ public class FullHouseTest {
         assertEquals("Full House (4,A)", fullHouse.toString());
     }
 
-}
+} // end class FullHouseTest

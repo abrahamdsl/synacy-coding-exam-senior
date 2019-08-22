@@ -9,7 +9,8 @@ public enum CardRank {
 	SEVEN("7"), EIGHT("8"), NINE("9"), TEN("10"),
 	JACK("J"), QUEEN("Q"), KING("K"), ACE("A");
 
-	private String this_version = "v0.0.1_main_d20181121-2358";
+	private String this_version = "v0.1.0_main_d20190822-2358";
+	// @changelog : Just added 'end class'
 
 	private String value;
 
@@ -22,4 +23,4 @@ public enum CardRank {
 		return value;
 	}
 
-}
+} // end enum CardRank

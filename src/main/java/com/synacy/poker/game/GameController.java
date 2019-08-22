@@ -11,7 +11,8 @@ import java.util.List;
 
 @Controller
 public class GameController {
-	private String this_version = "v0.0.1_main_d20181121-2358";
+	private String this_version = "v0.1.0_main_d20190822-2358";
+	// @changelog : Just added 'end class' indicator, re-styled
 
 	private Game game;
 
@@ -56,4 +57,4 @@ public class GameController {
 		return "redirect:/";
 	}
 
-}
+} // end class GameController

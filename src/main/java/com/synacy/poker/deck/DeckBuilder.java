@@ -14,7 +14,9 @@ import java.util.stream.Collectors;
  */
 @Component
 public class DeckBuilder {
-	private String this_version = "v0.1.0_main_d20190815-2300";
+	private String this_version = "v0.1.0_main_d20190822-2358";
+	// @changelog : Just re-arranged variables methods according to alphabetical order and well-known
+	//   standards.
 
 	/**
 	 * Builds a complete {@link Deck} without Jokers. Does not shuffle the deck.
@@ -28,6 +30,14 @@ public class DeckBuilder {
 		return deck;
 	}
 
+	private List<Card> cardsForSuit(CardSuit suit) {
+		CardRank[] cardRanks = CardRank.values();
+
+		return Arrays.stream(cardRanks)
+				.map(rank -> new Card(rank, suit))
+				.collect(Collectors.toList());
+	}
+
 	private List<Card> generateCards() {
 		CardSuit[] cardSuits = CardSuit.values();
 
@@ -38,12 +48,4 @@ public class DeckBuilder {
 				.collect(Collectors.toList());
 	}
 
-	private List<Card> cardsForSuit(CardSuit suit) {
-		CardRank[] cardRanks = CardRank.values();
-
-		return Arrays.stream(cardRanks)
-				.map(rank -> new Card(rank, suit))
-				.collect(Collectors.toList());
-	}
-
-}
+} // end class DeckBuilder

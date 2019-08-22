@@ -12,22 +12,8 @@ import java.util.List;
 import static org.junit.Assert.assertEquals;
 
 public class StraightFlushTest {
-	private String this_version = "v0.0.1_main_d20181121-2358";
-
-	@Test
-	public void toString_withKingHighStraightFlush() {
-		List<Card> cards = Arrays.asList(
-				new Card(CardRank.KING, CardSuit.CLUBS),
-				new Card(CardRank.QUEEN, CardSuit.CLUBS),
-				new Card(CardRank.JACK, CardSuit.CLUBS),
-				new Card(CardRank.TEN, CardSuit.CLUBS),
-				new Card(CardRank.NINE, CardSuit.CLUBS)
-		);
-
-		StraightFlush straightFlush = new StraightFlush(cards);
-
-		assertEquals("Straight Flush (K High)", straightFlush.toString());
-	}
+	private String this_version = "v0.1.0_main_d20190822-2358";
+	// @changelog : Just added 'end class' indicator, re-arranged functions alphabetically
 
 	@Test
 	public void toString_withFiveHighStraightFlush() {
@@ -45,6 +31,21 @@ public class StraightFlushTest {
 	}
 
 	@Test
+	public void toString_withKingHighStraightFlush() {
+		List<Card> cards = Arrays.asList(
+				new Card(CardRank.KING, CardSuit.CLUBS),
+				new Card(CardRank.QUEEN, CardSuit.CLUBS),
+				new Card(CardRank.JACK, CardSuit.CLUBS),
+				new Card(CardRank.TEN, CardSuit.CLUBS),
+				new Card(CardRank.NINE, CardSuit.CLUBS)
+		);
+
+		StraightFlush straightFlush = new StraightFlush(cards);
+
+		assertEquals("Straight Flush (K High)", straightFlush.toString());
+	}
+
+	@Test
 	public void toString_withRoyalFlush() {
 		List<Card> cards = Arrays.asList(
 				new Card(CardRank.ACE, CardSuit.CLUBS),
@@ -59,4 +60,4 @@ public class StraightFlushTest {
 		assertEquals("Royal Flush", straightFlush.toString());
 	}
 
-}
+} // end class StraightFlushTest

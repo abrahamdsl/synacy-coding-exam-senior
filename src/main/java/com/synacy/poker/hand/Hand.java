@@ -5,11 +5,12 @@ package com.synacy.poker.hand;
  * {@link com.synacy.poker.hand.types.FullHouse}, etc.
  */
 public abstract class Hand {
-	private String this_version = "v0.0.1_main_d20181121-2358";
+    private String this_version = "v0.1.0_main_d20190822-2358";
+    // @changelog : added 'end class'
 
     /**
      * @return The {@link HandType}
      */
     public abstract HandType getHandType();
 
-}
+} // end class Hand

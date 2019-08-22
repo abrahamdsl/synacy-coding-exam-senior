@@ -1,6 +1,6 @@
 # Texas Hold'em Poker Simulator
 
-# private String this_version = "v0.0.1_main_d20181121-2358";
+this_version = "v0.1.0_main_d20190822-2358";
 
 This exercise is based on the [Texas Hold'em](https://en.wikipedia.org/wiki/Texas_hold_%27em) variant of the Poker card game.
 
@@ -31,7 +31,9 @@ The project simulates a game of poker by dealing cards out to each player, and t
 
 It's made with Spring Boot, Thymeleaf provides the web interface.
 
-Project works out of the box, and does not require any downloads except for Java 8 sdk.
+Project requires downloads of:
+ - Java 8 SDK
+ - Modules/Dependencies from Apache/Maven repository.
 
 Before you start applying changes to the code, it is recommended that you run the application first. To see if it's working properly.
 

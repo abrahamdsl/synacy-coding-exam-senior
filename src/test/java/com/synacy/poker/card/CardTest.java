@@ -5,22 +5,16 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 
 public class CardTest {
-	private String this_version = "v0.0.1_main_d20181121-2358";
+	private String this_version = "v0.1.0_main_d20190822-2358";
+	// @changelog : Just added 'end class' indicator, re-arranged functions alphabetically
 
 	@Test
-	public void testCardEquality_sameRankAndSuitAreConsideredEqual() {
-		Card card1 = new Card(CardRank.ACE, CardSuit.DIAMONDS);
-		Card card2 = new Card(CardRank.ACE, CardSuit.DIAMONDS);
+	public void styleClass_whenClubsOrSpades_returnsBlackClass() {
+		Card card1 = new Card(CardRank.ACE, CardSuit.CLUBS);
+		Card card2 = new Card(CardRank.ACE, CardSuit.SPADES);
 
-		assertEquals(card1, card2);
-	}
-
-	@Test
-	public void testCardEquality_differentRankAndSuitAreNotEqual() {
-		Card card1 = new Card(CardRank.ACE, CardSuit.DIAMONDS);
-		Card card2 = new Card(CardRank.KING, CardSuit.DIAMONDS);
-
-		assertNotEquals(card1, card2);
+		assertEquals("card-black", card1.styleClass());
+		assertEquals("card-black", card2.styleClass());
 	}
 
 	@Test
@@ -33,12 +27,19 @@ public class CardTest {
 	}
 
 	@Test
-	public void styleClass_whenClubsOrSpades_returnsBlackClass() {
-		Card card1 = new Card(CardRank.ACE, CardSuit.CLUBS);
-		Card card2 = new Card(CardRank.ACE, CardSuit.SPADES);
+	public void testCardEquality_differentRankAndSuitAreNotEqual() {
+		Card card1 = new Card(CardRank.ACE, CardSuit.DIAMONDS);
+		Card card2 = new Card(CardRank.KING, CardSuit.DIAMONDS);
 
-		assertEquals("card-black", card1.styleClass());
-		assertEquals("card-black", card2.styleClass());
+		assertNotEquals(card1, card2);
 	}
 
-}
+	@Test
+	public void testCardEquality_sameRankAndSuitAreConsideredEqual() {
+		Card card1 = new Card(CardRank.ACE, CardSuit.DIAMONDS);
+		Card card2 = new Card(CardRank.ACE, CardSuit.DIAMONDS);
+
+		assertEquals(card1, card2);
+	}
+
+} // end class CardTest

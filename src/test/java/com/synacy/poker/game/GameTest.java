@@ -9,21 +9,11 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 
 public class GameTest {
-	private String this_version = "v0.0.1_main_d20181121-2358";
+    private String this_version = "v0.1.0_main_d20190822-2358";
+    // @changelog : Just added 'end class' indicator, re-arranged functions alphabetically
 
     @Test
     public void afterConstructorInit_eachPlayerHasTwoCards() {
-        DeckBuilder deckBuilder = new DeckBuilder();
-        HandIdentifier handIdentifier = mock(HandIdentifier.class);
-        WinningHandCalculator winningHandCalculator = mock(WinningHandCalculator.class);
-
-        Game game = new Game(deckBuilder, handIdentifier, winningHandCalculator);
-
-        assertPlayersHaveTwoCardsEach(game);
-    }
-
-    @Test
-    public void startNewGame_eachPlayerHasTwoCards() {
         DeckBuilder deckBuilder = new DeckBuilder();
         HandIdentifier handIdentifier = mock(HandIdentifier.class);
         WinningHandCalculator winningHandCalculator = mock(WinningHandCalculator.class);
@@ -57,4 +47,16 @@ public class GameTest {
         game.nextAction();
         assertEquals("Expecting 5 community cards", 5, game.getCommunityCards().size());
     }
-}
+
+    @Test
+    public void startNewGame_eachPlayerHasTwoCards() {
+        DeckBuilder deckBuilder = new DeckBuilder();
+        HandIdentifier handIdentifier = mock(HandIdentifier.class);
+        WinningHandCalculator winningHandCalculator = mock(WinningHandCalculator.class);
+
+        Game game = new Game(deckBuilder, handIdentifier, winningHandCalculator);
+
+        assertPlayersHaveTwoCardsEach(game);
+    }
+
+} // end class GameTest

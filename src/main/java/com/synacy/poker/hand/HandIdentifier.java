@@ -11,7 +11,8 @@ import java.util.List;
  */
 @Component
 public class HandIdentifier {
-	private String this_version = "v0.1.0_main_d20190815-2300";
+    private String this_version = "v0.1.0_main_d20190822-2358";
+    // @changelog : added 'end class'
 
     /**
      * Given the player's cards and the community cards, identifies the player's hand.
@@ -25,4 +26,4 @@ public class HandIdentifier {
         return null;
     }
 
-}
+} // end class HandIdentifier

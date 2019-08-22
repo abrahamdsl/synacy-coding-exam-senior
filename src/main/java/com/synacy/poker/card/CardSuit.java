@@ -19,16 +19,21 @@ package com.synacy.poker.card;
  */
 public enum CardSuit {
 
-	SPADES("&spades;", "black"), CLUBS("&clubs;", "black"), DIAMONDS("&diams;", "red"), HEARTS("&hearts;", "red");
+	SPADES("&spades;", "black"),
+	CLUBS("&clubs;", "black"),
+	DIAMONDS("&diams;", "red"),
+	HEARTS("&hearts;", "red");
 
-	private String this_version = "v0.0.1_main_d20181121-2358";
+	private String this_version = "v0.1.0_main_d20190822-2358";
+	// @changelog : Just re-coded, re-arranged variables enum according to alphabetical order and well-known
+	//   standards.
 
-	private String value;
 	private String color;
+	private String value;
 
 	CardSuit(String value, String color) {
-		this.value = value;
 		this.color = color;
+		this.value = value;
 	}
 
 	/**
@@ -47,4 +52,4 @@ public enum CardSuit {
 		return value;
 	}
 
-}
+} // end enum CardSuit

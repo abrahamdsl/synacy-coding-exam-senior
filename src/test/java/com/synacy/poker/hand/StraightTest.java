@@ -12,7 +12,8 @@ import java.util.List;
 import static org.junit.Assert.assertEquals;
 
 public class StraightTest {
-	private String this_version = "v0.0.1_main_d20181121-2358";
+    private String this_version = "v0.1.0_main_d20190822-2358";
+    // @changelog : Just added 'end class' indicator, re-arranged functions alphabetically
 
     @Test
     public void toString_withAceHighStraight() {
@@ -30,21 +31,6 @@ public class StraightTest {
     }
 
     @Test
-    public void toString_withKingHighStraight() {
-        List<Card> cards = Arrays.asList(
-                new Card(CardRank.KING, CardSuit.CLUBS),
-                new Card(CardRank.QUEEN, CardSuit.DIAMONDS),
-                new Card(CardRank.JACK, CardSuit.SPADES),
-                new Card(CardRank.TEN, CardSuit.CLUBS),
-                new Card(CardRank.NINE, CardSuit.CLUBS)
-        );
-
-        Straight straight = new Straight(cards);
-
-        assertEquals("Straight (K High)", straight.toString());
-    }
-
-    @Test
     public void toString_withFiveHighStraight() {
         List<Card> cards = Arrays.asList(
                 new Card(CardRank.FIVE, CardSuit.CLUBS),
@@ -59,4 +45,19 @@ public class StraightTest {
         assertEquals("Straight (5 High)", straight.toString());
     }
 
-}
+    @Test
+    public void toString_withKingHighStraight() {
+        List<Card> cards = Arrays.asList(
+                new Card(CardRank.KING, CardSuit.CLUBS),
+                new Card(CardRank.QUEEN, CardSuit.DIAMONDS),
+                new Card(CardRank.JACK, CardSuit.SPADES),
+                new Card(CardRank.TEN, CardSuit.CLUBS),
+                new Card(CardRank.NINE, CardSuit.CLUBS)
+        );
+
+        Straight straight = new Straight(cards);
+
+        assertEquals("Straight (K High)", straight.toString());
+    }
+
+} // end class StraightTest

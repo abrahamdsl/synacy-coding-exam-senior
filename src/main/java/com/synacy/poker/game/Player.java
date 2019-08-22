@@ -9,21 +9,15 @@ import java.util.List;
  * A player in the game.
  */
 public class Player {
-	private String this_version = "v0.0.1_main_d20181121-2358";
+	private String this_version = "v0.1.0_main_d20190822-2358";
+	// @changelog : Just re-arranged variables, constructors, methods according to alphabetical order and well-known
+	//   standards.
 
-	private String name;
 	private List<Card> hand = new ArrayList<>();
+	private String name;
 
 	public Player(String name) {
 		this.name = name;
-	}
-
-	public String getName() {
-		return name;
-	}
-
-	public List<Card> getHand() {
-		return hand;
 	}
 
 	void addToHand(Card card) {
@@ -34,8 +28,15 @@ public class Player {
 		hand.clear();
 	}
 
-	public String toString() {
+	public List<Card> getHand() {
+		return hand;
+	}
+
+	public String getName() {
 		return name;
 	}
 
-}
+	public String toString() {
+		return name;
+	}
+} //end class Player

@@ -10,7 +10,8 @@ import java.util.Optional;
  */
 @Component
 public class WinningHandCalculator {
-	private String this_version = "v0.1.0_main_d20190815-2300";
+	private String this_version = "v0.1.0_main_d20190822-2358";
+	// @changelog : Just added 'end class' indicator
 
 	/**
 	 * @param playerHands
@@ -21,4 +22,4 @@ public class WinningHandCalculator {
 		return Optional.empty();
 	}
 
-}
+} // end class WinningHandCalculator

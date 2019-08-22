@@ -12,7 +12,9 @@ import java.util.Set;
  * A complete set of {@link Card} without Jokers.
  */
 public class Deck {
-	private String this_version = "v0.0.1_main_d20181121-2358";
+	private String this_version = "v0.1.0_main_d20190822-2358";
+	// @changelog : Just re-arranged methods according to alphabetical order and well-known
+	//   standards.
 
 	private Set<Card> orderedCards = new LinkedHashSet<>();
 
@@ -35,15 +37,6 @@ public class Deck {
 	}
 
 	/**
-	 * Shuffles the deck.
-	 */
-	public void shuffle() {
-		List<Card> cardList = new ArrayList<>(orderedCards);
-		Collections.shuffle(cardList);
-		orderedCards = new LinkedHashSet<>(cardList);
-	}
-
-	/**
 	 * Removes a {@link Card} from the top of the deck. The removed card is returned to the client.
 	 *
 	 * @return The removed {@link Card}
@@ -60,10 +53,19 @@ public class Deck {
 	}
 
 	/**
+	 * Shuffles the deck.
+	 */
+	public void shuffle() {
+		List<Card> cardList = new ArrayList<>(orderedCards);
+		Collections.shuffle(cardList);
+		orderedCards = new LinkedHashSet<>(cardList);
+	}
+
+	/**
 	 * @return The number of cards currently in the deck.
 	 */
 	public int size() {
 		return orderedCards.size();
 	}
 
-}
+} // end class Deck

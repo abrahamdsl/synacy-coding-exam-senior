@@ -12,7 +12,8 @@ import java.util.List;
 import static org.junit.Assert.assertEquals;
 
 public class HighCardTest {
-	private String this_version = "v0.0.1_main_d20181121-2358";
+    private String this_version = "v0.1.0_main_d20190822-2358";
+    // @changelog : Just added 'end class' indicator
 
     @Test
     public void toString_withHighCards() {
@@ -29,4 +30,4 @@ public class HighCardTest {
         assertEquals("A,K,Q,3,2", highCard.toString());
     }
 
-}
+} // end class HighCardTest

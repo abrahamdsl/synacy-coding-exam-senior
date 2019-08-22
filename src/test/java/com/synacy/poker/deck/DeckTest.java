@@ -11,18 +11,14 @@ import java.util.Arrays;
 import static org.junit.Assert.assertEquals;
 
 public class DeckTest {
-	private String this_version = "v0.0.1_main_d20181121-2358";
+	private String this_version = "v0.1.0_main_d20190822-2358";
+	// @changelog : Just added 'end class' indicator, re-arranged functions alphabetically
 
 	private Deck deck;
 
 	@Before
 	public void setUp() {
 		deck = new Deck();
-	}
-
-	@Test
-	public void constructor_initializesWithNoCards() {
-		assertEquals(0, deck.size());
 	}
 
 	@Test
@@ -35,27 +31,34 @@ public class DeckTest {
 	}
 
 	@Test
-	public void shuffle_returnsShuffledDeckOfEqualSize() {
-		Card aceHearts = new Card(CardRank.ACE, CardSuit.HEARTS);
-		Card aceDiamonds = new Card(CardRank.ACE, CardSuit.DIAMONDS);
-		Card aceClubs = new Card(CardRank.ACE, CardSuit.CLUBS);
-		Card aceSpades = new Card(CardRank.ACE, CardSuit.SPADES);
-		deck.addCards(Arrays.asList(aceHearts, aceDiamonds, aceClubs, aceSpades));
-
-		deck.shuffle();
-
-		assertEquals(4, deck.size());
+	public void constructor_initializesWithNoCards() {
+		assertEquals(0, deck.size());
 	}
 
 	@Test
 	public void removeFromTop_removeCardFromTopOfDeck() {
 		Card expectedTopCard = new Card(CardRank.ACE, CardSuit.HEARTS);
 		Card bottomCard = new Card(CardRank.ACE, CardSuit.DIAMONDS);
-		deck.addCards(Arrays.asList(expectedTopCard, bottomCard));
+		Card actualRemovedTopCard;
 
-		Card actualRemovedTopCard = deck.removeFromTop();
+		deck.addCards(Arrays.asList(expectedTopCard, bottomCard));
+		actualRemovedTopCard = deck.removeFromTop();
 
 		assertEquals(expectedTopCard, actualRemovedTopCard);
 	}
 
-}
+	@Test
+	public void shuffle_returnsShuffledDeckOfEqualSize() {
+		Card aceClubs = new Card(CardRank.ACE, CardSuit.CLUBS);
+		Card aceSpades = new Card(CardRank.ACE, CardSuit.SPADES);
+
+		Card aceDiamonds = new Card(CardRank.ACE, CardSuit.DIAMONDS);
+		Card aceHearts = new Card(CardRank.ACE, CardSuit.HEARTS);
+
+		deck.addCards(Arrays.asList(aceHearts, aceDiamonds, aceClubs, aceSpades));
+		deck.shuffle();
+
+		assertEquals(4, deck.size());
+	}
+
+} // end class DeckTest
