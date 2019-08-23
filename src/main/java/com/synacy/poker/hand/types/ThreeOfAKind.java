@@ -9,8 +9,9 @@ import java.util.List;
 /**
  * @see <a href="https://en.wikipedia.org/wiki/List_of_poker_hands#Three_of_a_kind">What is a Three of a Kind?</a>
  */
+// Changelog: implemented .toString(), added 'end class'
 public class ThreeOfAKind extends Hand {
-	private String this_version = "v0.0.1_main_d20181121-2358";
+	private String this_version = "v0.2.0_main_d20190823-2358";
 
     private List<Card> threeOfAKindCards;
     private List<Card> otherCards;
@@ -28,8 +29,16 @@ public class ThreeOfAKind extends Hand {
      * @return The name of the hand plus kickers in descending rank, e.g. Trips (4) - A,2 High
      */
     @Override
-    public String toString() {
-        return "";
-    }
+    public String toString()
+    {
+        int y = otherCards.size() - 1;
+        int x  = y - 1;
+        return String.format(
+                "Trips (%s) - %s,%s High",
+                threeOfAKindCards.get(0).getRank().toString(),
+                otherCards.get(y).getRank().toString(),
+                otherCards.get(x).getRank().toString()
+        );
+    } // end method toString
 
-}
+} // end class ThreeOfAKind

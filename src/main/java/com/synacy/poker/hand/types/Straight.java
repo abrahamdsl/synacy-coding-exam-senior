@@ -9,8 +9,9 @@ import java.util.List;
 /**
  * @see <a href="https://en.wikipedia.org/wiki/List_of_poker_hands#Straight">What is a Straight?</a>
  */
+// Changelog: implemented .toString(), added 'end class'
 public class Straight extends Hand {
-	private String this_version = "v0.0.1_main_d20181121-2358";
+	private String this_version = "v0.2.0_main_d20190823-2358";
 
     private List<Card> cards;
 
@@ -30,8 +31,12 @@ public class Straight extends Hand {
      * @return The name of the hand and the high card, e.g. Straight (A High)
      */
     @Override
-    public String toString() {
-        return "";
-    }
+    public String toString()
+    {
+        return String.format(
+                "Straight (%s High)",
+                cards.get( cards.size() - 1).getRank().toString()
+        );
+    } // end method toString
 
-}
+} // end class Straight

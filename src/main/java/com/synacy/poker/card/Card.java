@@ -5,8 +5,9 @@ import java.util.Objects;
 /**
  * The card in a deck. A combination of {@link CardRank} and {@link CardSuit}
  */
+// CHANGELOG : New method getRankInOrdinalOrder()
 public class Card {
-	private String this_version = "v0.1.0_main_d20190822-2358";
+	private String this_version = "v0.2.0_main_d20190823-2358";
 	// @changelog : Just re-arranged methods according to alphabetical order and well-known
 	//   standards.
 
@@ -33,6 +34,12 @@ public class Card {
 	public CardRank getRank() {
 		return rank;
 	}
+
+  // Gets rank in ordinal order - as how it's aligned ordinarily in the code.
+  // @todo : Ace can be used as one or ten depending on the category.
+  public int getRankInOrdinalOrder(){
+    return rank.ordinal();
+  } // end method getRankInOrdinalOrder
 
 	/**
 	 * @return The {@link CardSuit}

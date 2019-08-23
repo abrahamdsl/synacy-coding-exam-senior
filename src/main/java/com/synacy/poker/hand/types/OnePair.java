@@ -9,8 +9,9 @@ import java.util.List;
 /**
  * @see <a href="https://en.wikipedia.org/wiki/List_of_poker_hands#One_pair">What is a One Pair?</a>
  */
+// Changelog: implemented .toString(), added 'end class'
 public class OnePair extends Hand {
-	private String this_version = "v0.0.1_main_d20181121-2358";
+	private String this_version = "v0.2.0_main_d20190823-2358";
 
     private List<Card> pairCards;
     private List<Card> otherCards;
@@ -29,8 +30,21 @@ public class OnePair extends Hand {
      * or the name of the hand and rank if there are no community cards yet in play, e.g. One Pair (2)
      */
     @Override
-    public String toString() {
-        return "";
-    }
+    public String toString(){
+        String ret = String.format( "One Pair (%s)", pairCards.get(0).getRank().toString() );
+        int s = otherCards.size();
 
-}
+        if( ! (otherCards == null || s == 0 ) ){
+
+            ret += String.format(
+              " - %s,%s,%s High",
+              otherCards.get(s-1).getRank().toString(),
+              otherCards.get(s-2).getRank().toString(),
+              otherCards.get(s-3).getRank().toString()
+            );
+        }
+
+        return ret;
+    } // end method toString
+
+} // end class OnePair
