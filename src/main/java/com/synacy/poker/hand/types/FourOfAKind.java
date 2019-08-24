@@ -9,8 +9,9 @@ import java.util.List;
 /**
  * @see <a href="https://en.wikipedia.org/wiki/List_of_poker_hands#Four_of_a_kind">What is a Four of a Kind?</a>
  */
+// @changelog : Implemented .toString() and added 'end class'
 public class FourOfAKind extends Hand {
-	private String this_version = "v0.0.1_main_d20181121-2358";
+	private String this_version = "v0.3.0_main_d20190824-1800";
 
     private List<Card> fourOfAKindCards;
     private List<Card> otherCards;
@@ -29,7 +30,11 @@ public class FourOfAKind extends Hand {
      */
     @Override
     public String toString() {
-        return "";
+        return String.format(
+                "Quads (%s) - %s High",
+                fourOfAKindCards.get(0).getRank(),
+                otherCards.get( otherCards.size() - 1).getRank()
+        );
     }
 
-}
+} // end class FourOfAKind

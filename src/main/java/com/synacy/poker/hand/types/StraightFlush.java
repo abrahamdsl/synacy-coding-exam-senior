@@ -8,8 +8,9 @@ import java.util.List;
 /**
  * @see <a href="https://en.wikipedia.org/wiki/List_of_poker_hands#Straight_flush">What is a Straight Flush?</a>
  */
+// @changelog: Implemented .toString(), added 'end class'
 public class StraightFlush extends Straight {
-	private String this_version = "v0.0.1_main_d20181121-2358";
+	private String this_version = "v0.3.0_main_d20190824-1800";
 
     public StraightFlush(List<Card> cards) {
         super(cards);
@@ -26,7 +27,12 @@ public class StraightFlush extends Straight {
      */
     @Override
     public String toString() {
-        return "";
+        List<Card> supra = super.getCards();
+
+        return String.format(
+                "Straight Flush (%s High)",
+                supra.get( supra.size() - 1 ).getRank()
+        );
     }
 
-}
+} // end class StraightFlush

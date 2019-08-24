@@ -20,20 +20,129 @@ import static com.synacy.poker.card.CardSuit.*;
  */
 /*
   Changelog:
-   in identifyHand(), can now identify:
-     High Card, One Pair, Two Pair, Three of a Kind, Straight
+   in identifyHand(), can now also identify:
+     Flush, Full House, Four of a Kind, Straight Flush
 
      ..and created respective methods if any
 
-   added methods:
-     mergeCards
-     getOrderedCards
-     getPairwiseCards
 */
 @Component
 public class HandIdentifier {
-    private String this_version = "v0.2.0_main_d20190823-2358";
-    // @changelog : added 'end class'
+    private String this_version = "v0.3.0_main_d20190824-1800";
+    // @changelog : see above
+
+    /**
+     * Given the player's cards and the community cards, try to identify if
+     *   there's a 'Flush Pattern'.
+     *
+     * @param playerCards
+     * @param communityCards
+     * @return The list of the player's top five highest {@link Card}s.
+     */
+    // @todo : Change the algorithm to maybe use something relating to Perl's
+    //   hashes, to reduce variables and if statements.
+    private List<Card> getFlush( List<Card> playerCards,
+                                    List<Card> communityCards)
+    {
+        final int CANDIDATE_COUNT = 5;
+
+        List<Card> consideredCards = getOrderedCards( mergeCards( playerCards, communityCards ) );
+        List<Card> spades = new ArrayList<Card>();
+        List<Card> clubs = new ArrayList<Card>();
+        List<Card> hearts = new ArrayList<Card>();
+        List<Card> diamonds = new ArrayList<Card>();
+
+        for( Card examine: consideredCards ){
+            switch( examine.getSuit() ) {
+                case DIAMONDS :
+                    diamonds.add( examine );
+                    break;
+                case HEARTS :
+                    hearts.add( examine );
+                    break;
+                case CLUBS :
+                    clubs.add( examine );
+                    break;
+                case SPADES :
+                    spades.add( examine );
+                    break;
+            }
+        }
+
+        if( clubs.size() >= CANDIDATE_COUNT )
+            return clubs;
+        if( diamonds.size() >= CANDIDATE_COUNT )
+            return diamonds;
+        if( hearts.size() >= CANDIDATE_COUNT )
+            return hearts;
+        if( spades.size() >= CANDIDATE_COUNT )
+            return spades;
+
+        return null;
+    }// end method getFlush
+
+    /**
+     * Given the player's cards and the community cards, try to identify if
+     *   there's a 'Four of a Kind' pattern.
+     *
+     * @param playerCards
+     * @param communityCards
+     * @return List of two pairs of {@link Card}s of the same ranks, or null
+     *   if this pattern isn't present.
+     */
+    private List<Card> getFourOfAKind( List<Card> playerCards,
+                                   List<Card> communityCards)
+    {
+        List<Card> consideredCards = mergeCards( playerCards, communityCards );
+        List<Card> pairs = getPairwiseCards( 4, consideredCards );
+
+        switch( pairs.size() ) {
+            case 4: return pairs;
+            default:
+                // @todo: review if possible
+                return null;
+        }
+    } // end method getFourOfAKind
+
+    /**
+     * Given the player's cards and the community cards, try to identify if
+     *   there's a 'Full House' pattern.
+     *
+     * @param playerCards
+     * @param communityCards
+     * @return List of two pairs of {@link Card}s of the same ranks, or null
+     *   if this pattern isn't present.
+     */
+    private List<Card> getFullHouse( List<Card> playerCards,
+                                       List<Card> communityCards)
+    {
+        List<Card> master = null;
+        List<Card> temp = new <Card>ArrayList();
+        List<Card> threePair = getThreeOfAKind(playerCards, communityCards);
+
+        if( threePair != null ){
+            List<Card> twoPair;
+            int x = 0;
+
+            temp = mergeCards(playerCards, communityCards);
+            temp.removeAll(threePair);
+            twoPair = getOnePair(new <Card>ArrayList(),temp);
+
+            if( twoPair == null)
+                return null;
+
+            x = twoPair.size();
+            if(  x > 0 ) {
+                master = new <Card>ArrayList();
+
+                master.addAll(threePair);
+                master.add( twoPair.get(x-2) );
+                master.add( twoPair.get(x-1) );
+            }
+        }
+
+        return master;
+    } // end method getFullHosue
 
     /**
      * Given the player's cards and the community cards, try to identify if
@@ -322,12 +431,45 @@ public class HandIdentifier {
       // Check if 'Royal Flush'
 
       // Check if 'Straight Flush'
+        if( theHand == null ) {
+            candidateCards = getStraight(playerCards, communityCards, true);
+
+            if (candidateCards != null) {
+                theHand = new StraightFlush(candidateCards);
+            }
+        }
 
       // Check if 'Four of a Kind'
+        if( theHand == null ) {
+            candidateCards = getFourOfAKind(playerCards, communityCards);
+
+            if( candidateCards != null ) {
+                List<Card> otherCards = getOrderedCards(
+                        mergeCards(playerCards, communityCards)
+                );
+                otherCards.removeAll(candidateCards);
+                theHand = new FourOfAKind(candidateCards, otherCards);
+            }
+        }
 
       // Check if 'Full House'
+        if( theHand == null ) {
+            candidateCards = getFullHouse(playerCards, communityCards);
+
+            if( candidateCards != null )
+                theHand = new FullHouse(
+                    candidateCards.subList(0,4),
+                    candidateCards.subList(3,5)
+                 );
+        }
 
       // Check if 'Flush'
+        if( theHand == null ) {
+            candidateCards = getFlush(playerCards, communityCards);
+
+            if( candidateCards != null )
+                theHand = new Flush(candidateCards);
+        }
 
       // Check if 'Straight'
         if( theHand == null ) {
