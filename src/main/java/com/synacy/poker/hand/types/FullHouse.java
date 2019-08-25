@@ -9,9 +9,9 @@ import java.util.List;
 /**
  * @see <a href="https://en.wikipedia.org/wiki/List_of_poker_hands#Full_house">What is a Full House?</a>
  */
-// @changelog: Implemented .toString() and added 'end class'
+// @changelog : Just adjusted indent according to IntelliJ IDEA
 public class FullHouse extends Hand {
-	private String this_version = "v0.3.0_main_d20190824-1800";
+	private String this_version = "v0.4.0_main_d20190825-2358";
 
     private List<Card> threeOfAKindCards;
     private List<Card> pairCards;
@@ -32,9 +32,9 @@ public class FullHouse extends Hand {
     @Override
     public String toString() {
         return String.format(
-             "Full House (%s,%s)",
-             threeOfAKindCards.get(0).getRank(),
-             pairCards.get(0).getRank()
+                "Full House (%s,%s)",
+                threeOfAKindCards.get(0).getRank(),
+                pairCards.get(0).getRank()
         );
     }
 

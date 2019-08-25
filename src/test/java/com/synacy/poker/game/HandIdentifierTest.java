@@ -5,15 +5,7 @@ import com.synacy.poker.card.CardRank;
 import com.synacy.poker.card.CardSuit;
 import com.synacy.poker.hand.Hand;
 import com.synacy.poker.hand.HandIdentifier;
-import com.synacy.poker.hand.types.Flush;
-import com.synacy.poker.hand.types.FourOfAKind;
-import com.synacy.poker.hand.types.FullHouse;
-import com.synacy.poker.hand.types.HighCard;
-import com.synacy.poker.hand.types.OnePair;
-import com.synacy.poker.hand.types.Straight;
-import com.synacy.poker.hand.types.StraightFlush;
-import com.synacy.poker.hand.types.ThreeOfAKind;
-import com.synacy.poker.hand.types.TwoPair;
+import com.synacy.poker.hand.types.*;
 import org.junit.Test;
 
 import java.util.Arrays;
@@ -23,8 +15,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 public class HandIdentifierTest {
-	private String this_version = "v0.1.0_main_d20190822-2358";
-	// @changelog : Just added 'end class' indicator, re-arranged functions alphabetically
+	private String this_version = "v0.4.0_main_d20190825-2358";
+	// @changelog : Corrected wrong left operand in a RoyalFlush test
 
 	private HandIdentifier handIdentifier = new HandIdentifier();
 
@@ -150,7 +142,8 @@ public class HandIdentifierTest {
 
 		Hand identifiedHand = handIdentifier.identifyHand(playerCards, communityCards);
 
-		assertTrue(identifiedHand instanceof StraightFlush);
+		// ha, oopsie, this should have been RoyalFlush - that's why I'm in circles!
+		assertTrue(identifiedHand instanceof RoyalFlush);
 		assertEquals("Royal Flush", identifiedHand.toString());
 	}
 

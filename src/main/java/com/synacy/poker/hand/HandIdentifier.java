@@ -1,16 +1,12 @@
 package com.synacy.poker.hand;
 
 import com.synacy.poker.card.Card;
+import com.synacy.poker.card.CardRank;
 import com.synacy.poker.hand.types.*;
 import org.springframework.stereotype.Component;
 
-import java.lang.reflect.Array;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 
-import static com.sun.org.apache.bcel.internal.Repository.instanceOf;
 import static com.synacy.poker.card.CardSuit.*;
 
 
@@ -18,18 +14,41 @@ import static com.synacy.poker.card.CardSuit.*;
  * A service that is to used to identify the {@link Hand} given the player's cards and the community
  * cards.
  */
+// @todo: Aside from RoyalFlush, check other get functions for eliminatePossibleDuplicates
 /*
   Changelog:
    in identifyHand(), can now also identify:
-     Flush, Full House, Four of a Kind, Straight Flush
+     Royal Flush
 
      ..and created respective methods if any
 
+    import all of java.util.* - let compiler optimise :D
+    new method eliminatePossibleDuplicates()
+    constant CANDIDATE_COUNT made a class field in HandIdentifier
+    re-arranged functions according to alphabetical order
+    adjusted some indent according to IntelliJ IDEA
+    Used new constructor for Straight
+    A todo for all relevant functions
 */
 @Component
 public class HandIdentifier {
-    private String this_version = "v0.3.0_main_d20190824-1800";
-    // @changelog : see above
+    private String this_version = "v0.4.0_main_d20190825-2358";
+
+    private final int CANDIDATE_COUNT = 5;
+
+    private List<Card> eliminatePossibleDuplicates(List<Card> set1, List<Card> set2){
+        List<Card> consideredCards = mergeCards(set1, set2);
+        List<Card> dummyCardList = new <Card>ArrayList();
+        List<Card> possibleRankDuplicates = getOnePair(consideredCards, dummyCardList);
+
+        while( possibleRankDuplicates != null ){
+            // there's always at least 2 elements if not null
+            consideredCards.remove( possibleRankDuplicates.get(1) );
+
+            possibleRankDuplicates = getOnePair( consideredCards, dummyCardList );
+        }
+        return consideredCards;
+    }  // end method eliminatePossibleDuplicates
 
     /**
      * Given the player's cards and the community cards, try to identify if
@@ -44,8 +63,6 @@ public class HandIdentifier {
     private List<Card> getFlush( List<Card> playerCards,
                                     List<Card> communityCards)
     {
-        final int CANDIDATE_COUNT = 5;
-
         List<Card> consideredCards = getOrderedCards( mergeCards( playerCards, communityCards ) );
         List<Card> spades = new ArrayList<Card>();
         List<Card> clubs = new ArrayList<Card>();
@@ -142,7 +159,7 @@ public class HandIdentifier {
         }
 
         return master;
-    } // end method getFullHosue
+    } // end method getFullHouse
 
     /**
      * Given the player's cards and the community cards, try to identify if
@@ -253,7 +270,101 @@ public class HandIdentifier {
       return toBeSorted;
     } // end method getOrderedCards
 
-     /**
+    /**
+     * Check the list of player's cards for n-number of pairs.
+     *
+     * @param pairQuantity
+     * @param mergedCards
+     * @return List of pairs of {@link Card}s, or empty List if nothing found
+     */
+    public static List<Card> getPairwiseCards(
+            Integer pairQuantity,
+            List<Card> mergedCards
+    ) {
+        List<Card> pairwise = new <Card>ArrayList();
+        List<Card> master = new <Card>ArrayList();
+        //List<int> skips = new <int>ArrayList();
+
+        // @todo: What better algorithm could be rather than O(n^2) ?
+        //   - perhaps, iterate and determine ranks first. Put them in a set.
+        //    if size equals bla bla.. not okay.
+        // @todo: What if two pairs, separate here, or in the other function?
+        for( Card firstCard : mergedCards ){
+            // already chosen as part of a pair, so irrelevant now
+            if( master.size() != 0 && master.contains(firstCard) )
+                continue;
+
+            pairwise.add( firstCard );
+            for( Card secondCard: mergedCards ){
+                // skip if same card
+                if( firstCard.equals( secondCard ) )
+                    continue;
+
+                // already chosen as part of a pair, so irrelevant now
+                // @todo : is this really needed ?
+                if( master.size() != 0 && master.contains(secondCard) )
+                    continue;
+
+                // if same rank, add then
+                if( firstCard.getRankInOrdinalOrder() ==
+                        secondCard.getRankInOrdinalOrder()
+                ) {
+                    pairwise.add( secondCard );
+                }
+            } // end 'for each' loop -secondCard
+
+            // we have now reached the required number to search, so return now
+            // @todo: So in originating function, looks like three pairs must be
+            //   called first, before two pairs, or use modulus to this return's
+            //   List if not null
+            if( pairwise.size() != 0  && ( pairwise.size() % pairQuantity ) == 0 )
+                master.addAll(pairwise);
+
+            pairwise.clear();
+        } // end 'for each' loop -firstCard
+
+        return master;
+    } // end method ( getPairwiseCards )
+
+    /**
+     * Given the player's cards and the community cards, identify if
+     *  there's a Royal Flush pattern
+     *
+     *
+     * @param playerCards
+     * @param communityCards
+     * @return The player's {@link Hand} or `null` if no Hand was identified.
+     */
+    public List<Card> getRoyalFlush(List<Card> playerCards, List<Card> communityCards) {
+        List<Card> consideredCards = null;
+        List<Card> dummyCardList = new <Card>ArrayList();
+
+        String comparo = "10,J,Q,K,A";
+        String gotten = "";
+
+        consideredCards = getStraight(
+                eliminatePossibleDuplicates(playerCards, communityCards),
+                dummyCardList,
+                false
+        );
+
+        if( consideredCards == null )
+            return null;
+
+        gotten = String.format(
+                "%s,%s,%s,%s,%s",
+                consideredCards.get(0).getRank(),
+                consideredCards.get(1).getRank(),
+                consideredCards.get(2).getRank(),
+                consideredCards.get(3).getRank(),
+                consideredCards.get(4).getRank()
+        );
+
+        return ( comparo.equalsIgnoreCase( gotten ) ) ? consideredCards : null;
+        //return master;
+    } // end method getRoyalFlush
+
+    /**
      * Given the player's cards and the community cards, try to identify if
      *   there's a straight pattern.
      *
@@ -360,61 +471,7 @@ public class HandIdentifier {
       }
     } // end method getTwoPair
 
-    /**
-     * Check the list of player's cards for n-number of pairs.
-     *
-     * @param pairQuantity
-     * @param mergedCards
-     * @return List of pairs of {@link Card}s, or empty List if nothing found
-     */
-    public static List<Card> getPairwiseCards(
-      Integer pairQuantity,
-      List<Card> mergedCards
-    ) {
-      List<Card> pairwise = new <Card>ArrayList();
-      List<Card> master = new <Card>ArrayList();
-      //List<int> skips = new <int>ArrayList();
 
-      // @todo: What better algorithm could be rather than O(n^2) ?
-      //   - perhaps, iterate and determine ranks first. Put them in a set.
-      //    if size equals bla bla.. not okay.
-      // @todo: What if two pairs, separate here, or in the other function?
-      for( Card firstCard : mergedCards ){
-        // already chosen as part of a pair, so irrelevant now
-        if( master.size() != 0 && master.contains(firstCard) )
-          continue;
-
-        pairwise.add( firstCard );
-        for( Card secondCard: mergedCards ){
-          // skip if same card
-          if( firstCard.equals( secondCard ) )
-            continue;
-
-          // already chosen as part of a pair, so irrelevant now
-          // @todo : is this really needed ?
-          if( master.size() != 0 && master.contains(secondCard) )
-            continue;
-
-          // if same rank, add then
-          if( firstCard.getRankInOrdinalOrder() ==
-            secondCard.getRankInOrdinalOrder()
-          ) {
-            pairwise.add( secondCard );
-          }
-        } // end 'for each' loop -secondCard
-
-        // we have now reached the required number to search, so return now
-        // @todo: So in originating function, looks like three pairs must be
-        //   called first, before two pairs, or use modulus to this return's
-        //   List if not null
-        if( pairwise.size() != 0  && ( pairwise.size() % pairQuantity ) == 0 )
-          master.addAll(pairwise);
-
-        pairwise.clear();
-      } // end 'for each' loop -firstCard
-
-      return master;
-    } // end method ( getPairwiseCards )
 
     /**
      * Given the player's cards and the community cards, identifies the player's hand.
@@ -425,10 +482,15 @@ public class HandIdentifier {
      */
     public Hand identifyHand(List<Card> playerCards, List<Card> communityCards) {
       Hand theHand = null;
-      List<Card> candidateCards = new ArrayList<Card>();
+      List<Card> candidateCards = new <Card>ArrayList();
       // @comment adsllave here lah //:checkRanking(..) .. check which , then create a pre-supplied class based on it
 
       // Check if 'Royal Flush'
+        candidateCards = getRoyalFlush(playerCards, communityCards);
+
+        if (candidateCards != null) {
+            theHand = new RoyalFlush(candidateCards, candidateCards == null? "null" : "size: " + candidateCards.size() );
+        }
 
       // Check if 'Straight Flush'
         if( theHand == null ) {
@@ -458,9 +520,9 @@ public class HandIdentifier {
 
             if( candidateCards != null )
                 theHand = new FullHouse(
-                    candidateCards.subList(0,4),
-                    candidateCards.subList(3,5)
-                 );
+                        candidateCards.subList(0,4),
+                        candidateCards.subList(3,5)
+                );
         }
 
       // Check if 'Flush'
@@ -476,7 +538,7 @@ public class HandIdentifier {
             candidateCards = getStraight(playerCards, communityCards, false);
 
             if( ! ( candidateCards == null || candidateCards.size() == 0 ) ) {
-                theHand = new Straight(candidateCards);
+                theHand = new Straight(candidateCards, "raw");
             }
         }
 

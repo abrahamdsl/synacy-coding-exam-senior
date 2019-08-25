@@ -8,12 +8,17 @@ import java.util.List;
 /**
  * @see <a href="https://en.wikipedia.org/wiki/List_of_poker_hands#Straight_flush">What is a Straight Flush?</a>
  */
-// @changelog: Implemented .toString(), added 'end class'
+// @changelog: New constructor for debugging
 public class StraightFlush extends Straight {
-	private String this_version = "v0.3.0_main_d20190824-1800";
+	private String this_version = "v0.4.0_main_d20190825-2358";
+
 
     public StraightFlush(List<Card> cards) {
-        super(cards);
+        super(cards, "StraightFlush");
+    }
+
+    public StraightFlush(List<Card> cards, String desc) {
+        super(cards,desc);
     }
 
     @Override

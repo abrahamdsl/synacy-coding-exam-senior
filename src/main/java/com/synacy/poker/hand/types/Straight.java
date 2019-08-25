@@ -9,13 +9,22 @@ import java.util.List;
 /**
  * @see <a href="https://en.wikipedia.org/wiki/List_of_poker_hands#Straight">What is a Straight?</a>
  */
-// Changelog: implemented .toString(), added 'end class'
+// Changelog: new constructor(s) due to (debugging) changes in Straight
 public class Straight extends Hand {
-	private String this_version = "v0.2.0_main_d20190823-2358";
+	private String this_version = "v0.4.0_main_d20190825-2358";
 
     private List<Card> cards;
 
-    public Straight(List<Card> cards) {
+    public Straight(List<Card> cards){
+        this(cards, "Straight Desc Raw");
+    }
+
+    public Straight(List<Card> cards, String desc ) {
+        if( cards == null )
+            throw new ExceptionInInitializerError("Null cards >> " + desc);
+        if( cards.size() != 5 )
+            throw new ExceptionInInitializerError("Card size  not equal to 5 " + desc);
+
         this.cards = cards;
     }
 
