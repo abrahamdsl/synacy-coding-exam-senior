@@ -17,26 +17,22 @@ import static com.synacy.poker.card.CardSuit.*;
 // @todo: Aside from RoyalFlush, check other get functions for eliminatePossibleDuplicates
 /*
   Changelog:
-   in identifyHand(), can now also identify:
-     Royal Flush
-
-     ..and created respective methods if any
-
-    import all of java.util.* - let compiler optimise :D
-    new method eliminatePossibleDuplicates()
-    constant CANDIDATE_COUNT made a class field in HandIdentifier
-    re-arranged functions according to alphabetical order
-    adjusted some indent according to IntelliJ IDEA
-    Used new constructor for Straight
-    A todo for all relevant functions
+    Made most of methods public static
+    Refactoring to utilise generics
+    Debugging: added try-catch statements
+    Fixed order of the list of cards returned to the proper way -
+      patterns first if any, then the next highest ones.
+    getStraight()
+      now recognizes dual-ace
+      could throw a [general] Exception
 */
 @Component
 public class HandIdentifier {
-    private String this_version = "v0.4.0_main_d20190825-2358";
+    private String this_version = "v0.5.0_main_d20190902-2258";
 
-    private final int CANDIDATE_COUNT = 5;
+    private static final int CANDIDATE_COUNT = 5;
 
-    private List<Card> eliminatePossibleDuplicates(List<Card> set1, List<Card> set2){
+    public static List<Card> eliminatePossibleDuplicates(List<Card> set1, List<Card> set2){
         List<Card> consideredCards = mergeCards(set1, set2);
         List<Card> dummyCardList = new <Card>ArrayList();
         List<Card> possibleRankDuplicates = getOnePair(consideredCards, dummyCardList);
@@ -60,7 +56,7 @@ public class HandIdentifier {
      */
     // @todo : Change the algorithm to maybe use something relating to Perl's
     //   hashes, to reduce variables and if statements.
-    private List<Card> getFlush( List<Card> playerCards,
+    public static List<Card> getFlush( List<Card> playerCards,
                                     List<Card> communityCards)
     {
         List<Card> consideredCards = getOrderedCards( mergeCards( playerCards, communityCards ) );
@@ -169,11 +165,12 @@ public class HandIdentifier {
      * @param communityCards
      * @return The list of the player's top five highest {@link Card}s.
      */
-    private List<Card> getHighCard( List<Card> playerCards,
+    public static List<Card> getHighCard( List<Card> playerCards,
       List<Card> communityCards)
     {
       List<Card> consideredCards = getOrderedCards( mergeCards( playerCards, communityCards ) );
       List<Card> master = new ArrayList<Card>();
+
 
       // OLD ALGORITHM
       /*
@@ -197,12 +194,13 @@ public class HandIdentifier {
 
       // Get the highest 5, the last should be the highest
       int y = consideredCards.size();
-      int x = y;
-      x--;
-      x-=4;
-      for( ; x<y; x++ ){
-          master.add( consideredCards.get(x) );
-      }
+      int x = ( y - 1 ) - 4;
+
+/*      for( Card examine : consideredCards.subList( x, y ) ){
+          master.add( 0, examine );
+      }*/
+        master = consideredCards.subList( x, y );
+        Collections.reverse( master );
 
       return master;
     } // end method getHighCard
@@ -215,7 +213,7 @@ public class HandIdentifier {
      * @param communityCards
      * @return List of highest one-pair of card, or null.
      */
-    private List<Card> getOnePair( List<Card> playerCards,
+    public static List<Card> getOnePair( List<Card> playerCards,
       List<Card> communityCards)
     {
       List<Card> consideredCards = mergeCards( playerCards, communityCards );
@@ -255,7 +253,7 @@ public class HandIdentifier {
      * @param toBeSorted
      * @param List of sorted {@link Card}s.
      */
-    private List<Card> getOrderedCards( List<Card> toBeSorted ) {
+    public static List<Card> getOrderedCards( List<Card> toBeSorted ) {
       Collections.sort(
         toBeSorted,
         new Comparator<Card>()
@@ -335,18 +333,22 @@ public class HandIdentifier {
      * @param communityCards
      * @return The player's {@link Hand} or `null` if no Hand was identified.
      */
-    public List<Card> getRoyalFlush(List<Card> playerCards, List<Card> communityCards) {
+    public static List<Card> getRoyalFlush(List<Card> playerCards, List<Card> communityCards) {
         List<Card> consideredCards = null;
         List<Card> dummyCardList = new <Card>ArrayList();
 
         String comparo = "10,J,Q,K,A";
         String gotten = "";
 
-        consideredCards = getStraight(
-                eliminatePossibleDuplicates(playerCards, communityCards),
-                dummyCardList,
-                false
-        );
+		try {
+			consideredCards = getStraight(
+				eliminatePossibleDuplicates(playerCards, communityCards),
+				dummyCardList,
+				false
+			);
+		}catch(Exception e){
+			e.printStackTrace();
+		}
 
         if( consideredCards == null )
             return null;
@@ -374,13 +376,14 @@ public class HandIdentifier {
      *   if this pattern isn't present.
      */
     // @todo : Can ace be used both ways ( A-2-3-4-5 or 6-7-8-9-A ) ?
-    private List<Card> getStraight( List<Card> playerCards,
-      List<Card> communityCards, boolean sameSuit)
+    public static List<Card> getStraight( List<Card> playerCards,
+      List<Card> communityCards, boolean sameSuit) throws Exception
     {
       List<Card> orderedList = new <Card>ArrayList();
       List<Card> master = new <Card>ArrayList();
       Card previous = null;
       int count = 0;
+      int acePosition = -1;
 
       if( sameSuit ){
        // assumption: getFlush() always returns ordered cards
@@ -393,36 +396,109 @@ public class HandIdentifier {
           );
       }
 
+      // as of making, master is empty
+      orderedList = eliminatePossibleDuplicates(orderedList, master);
+
       // @todo : Does the compiler optimize : about int = 1, j = list.size()...?
-      int y = orderedList.size();
-      int x = y - 1;
+      int orderedList_size = orderedList.size();
+      int orderedListLastIndex = orderedList_size - 1 ;
+      int x = orderedListLastIndex;
+
+      // start of element up to five
       x -= 4;
-      previous = orderedList.get(x);
-      x++;
-      for( ; x<y; x++ ) {
-         Card examine = orderedList.get(x);
-        //if( previous != null ) {
-          if(
-              examine.getRankInOrdinalOrder() - previous.getRankInOrdinalOrder()
-              == 1
-          ){
-            master.add( previous );
-            count++;
-            // only five needed
-            if( count == 4 )  {
-              master.add( examine );
-              break;
-            }
-          }else{
-            master.clear();
-            break;
-          }
-        //}
-        previous = examine;
+
+      // check for ace - by default it's in the top always
+      if( orderedList.get(orderedListLastIndex).getRank().compareTo( CardRank.ACE ) == 0){
+          acePosition = orderedListLastIndex;
       }
 
-      //throw new Exception("This should not be reached?");
-        return master.size() == 5 ? master : null;
+      // meaning ace is present
+      if( acePosition > - 1 ){
+          // check first if it's the normal elite cards
+          String comparo = "";
+          String cardPattern = "";
+
+          comparo = String.format(
+                  "%s,%s,%s,%s,%s",
+                  CardRank.TEN,
+                  CardRank.JACK,
+                  CardRank.QUEEN,
+                  CardRank.KING,
+                  CardRank.ACE
+          );
+          cardPattern = String.format(
+                  "%s,%s,%s,%s,%s",
+                  orderedList.get(x).getRank(),
+                  orderedList.get(x+1).getRank(),
+                  orderedList.get(x+2).getRank(),
+                  orderedList.get(x+3).getRank(),
+                  orderedList.get(x+4).getRank()
+          );
+          if( cardPattern.equalsIgnoreCase(comparo) ){
+              // meaning, the top cards are 10,J,Q,K,A
+              master = orderedList.subList(x,orderedList_size);
+          }else{
+              comparo = String.format(
+                      "%s,%s,%s,%s",
+                      CardRank.TWO,
+                      CardRank.THREE,
+                      CardRank.FOUR,
+                      CardRank.FIVE
+              );
+              cardPattern = String.format(
+                      "%s,%s,%s,%s",
+                      orderedList.get(x).getRank(),
+                      orderedList.get(x+1).getRank(),
+                      orderedList.get(x+2).getRank(),
+                      orderedList.get(x+3).getRank()
+              );
+              if( cardPattern.equalsIgnoreCase(comparo) ){
+                // meaning, cards originally are in 2,3,4,5,A
+
+                // add the ace first
+                master.add( orderedList.get( orderedListLastIndex ) );
+                master.addAll( orderedList.subList( x, orderedListLastIndex ) );
+              }
+          }
+      }else{
+          previous = orderedList.get(x);
+          for( x++ ; x < orderedList_size; x++ ) {
+             Card examine = orderedList.get(x);
+            //if( previous != null ) {
+              if(
+                  examine.getRankInOrdinalOrder() - previous.getRankInOrdinalOrder()
+                  == 1
+              ){
+                master.add( previous );
+                count++;
+                // only five needed
+                if( count == 4 )  {
+                  master.add( examine );
+                  break;
+                }
+              }else{
+                master.clear();
+                break;
+              }
+            //}
+            previous = examine;
+          }
+      } // end if-else, no ace present
+
+        // @todo: debugging Remove this on production
+        if( master.size() != 5 ){
+            String vals = "msize=" + master.size() + "|";
+
+            for( Card examine: master ){
+                vals += String.format("(%s,%s),", examine.getRank(), examine.getSuit() );
+            }
+            throw new Exception( "getflush debug " + vals );
+        }else{
+            return master;
+        }
+
+        // @todo: Restore this upon removal of the debugging part before this.
+        //return master.size() == 5 ? master : null;
     } // end method getStraight
 
     /**
@@ -494,8 +570,11 @@ public class HandIdentifier {
 
       // Check if 'Straight Flush'
         if( theHand == null ) {
-            candidateCards = getStraight(playerCards, communityCards, true);
-
+            try {
+                candidateCards = getStraight(playerCards, communityCards, true);
+            }catch(Exception e){
+                e.printStackTrace();
+            }
             if (candidateCards != null) {
                 theHand = new StraightFlush(candidateCards);
             }
@@ -535,10 +614,13 @@ public class HandIdentifier {
 
       // Check if 'Straight'
         if( theHand == null ) {
-            candidateCards = getStraight(playerCards, communityCards, false);
-
+            try {
+                candidateCards = getStraight(playerCards, communityCards, false);
+            }catch(Exception e){
+                e.printStackTrace();
+            }
             if( ! ( candidateCards == null || candidateCards.size() == 0 ) ) {
-                theHand = new Straight(candidateCards, "raw");
+                theHand = new Straight(candidateCards, "Straight", false);
             }
         }
 
@@ -549,7 +631,10 @@ public class HandIdentifier {
             if( ! ( candidateCards == null || candidateCards.size() == 0 ) ) {
                 List<Card> otherCards = mergeCards(playerCards, communityCards);
                 otherCards.removeAll(candidateCards);
-                theHand = new ThreeOfAKind( candidateCards, getOrderedCards( otherCards ) );
+                getOrderedCards( otherCards );
+                otherCards.subList(0,2).clear();
+                Collections.reverse(otherCards);
+                theHand = new ThreeOfAKind( candidateCards, otherCards );
             }
         }
 
@@ -589,6 +674,8 @@ public class HandIdentifier {
             List<Card> otherCards = mergeCards(playerCards, communityCards);
             otherCards.removeAll(candidateCards);
             otherCards=getOrderedCards(otherCards);
+            otherCards.subList(0,2).clear();            // remove lowest two
+            Collections.reverse(otherCards);
             theHand = new OnePair(candidateCards, otherCards);
            }
        }

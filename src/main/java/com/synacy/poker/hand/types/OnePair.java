@@ -9,9 +9,9 @@ import java.util.List;
 /**
  * @see <a href="https://en.wikipedia.org/wiki/List_of_poker_hands#One_pair">What is a One Pair?</a>
  */
-// Changelog: implemented .toString(), added 'end class'
+// @changelog: in .toString() to adapt to changes in HandIdentifier
 public class OnePair extends Hand {
-	private String this_version = "v0.2.0_main_d20190823-2358";
+	private String this_version = "v0.5.0_main_d20190902-2258";
 
     private List<Card> pairCards;
     private List<Card> otherCards;
@@ -38,9 +38,9 @@ public class OnePair extends Hand {
 
             ret += String.format(
               " - %s,%s,%s High",
-              otherCards.get(s-1).getRank().toString(),
+              otherCards.get(s-3).getRank().toString(),
               otherCards.get(s-2).getRank().toString(),
-              otherCards.get(s-3).getRank().toString()
+              otherCards.get(s-1).getRank().toString()
             );
         }
 
