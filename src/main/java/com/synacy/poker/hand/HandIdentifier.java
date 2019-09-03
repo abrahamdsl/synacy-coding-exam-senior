@@ -17,18 +17,17 @@ import static com.synacy.poker.card.CardSuit.*;
 // @todo: Aside from RoyalFlush, check other get functions for eliminatePossibleDuplicates
 /*
   Changelog:
-    Made most of methods public static
-    Refactoring to utilise generics
-    Debugging: added try-catch statements
-    Fixed order of the list of cards returned to the proper way -
-      patterns first if any, then the next highest ones.
-    getStraight()
-      now recognizes dual-ace
-      could throw a [general] Exception
+    @bugfix for get<HandType>() functions, checked if candidate cards
+      count is at least five, else return null.
+    Always call getHighCard if search for higher hands returned null.
+    Minor grammatical changes in comments
+    re-coding like indents and spacing and extending column limit to
+      100 because IntelliJ IDEA defaults to that anyway.
+    Removed obsoleted/commented-out code
 */
 @Component
 public class HandIdentifier {
-    private String this_version = "v0.5.0_main_d20190902-2258";
+    private String this_version = "v0.5.1_main_d20190903-2200";
 
     private static final int CANDIDATE_COUNT = 5;
 
@@ -38,7 +37,7 @@ public class HandIdentifier {
         List<Card> possibleRankDuplicates = getOnePair(consideredCards, dummyCardList);
 
         while( possibleRankDuplicates != null ){
-            // there's always at least 2 elements if not null
+            // there's always at least 2 elements, if not null
             consideredCards.remove( possibleRankDuplicates.get(1) );
 
             possibleRankDuplicates = getOnePair( consideredCards, dummyCardList );
@@ -56,14 +55,14 @@ public class HandIdentifier {
      */
     // @todo : Change the algorithm to maybe use something relating to Perl's
     //   hashes, to reduce variables and if statements.
-    public static List<Card> getFlush( List<Card> playerCards,
-                                    List<Card> communityCards)
-    {
+    // @todo : How about throwing exception , because cannot determine suit?
+    public static List<Card> getFlush( List<Card> playerCards, List<Card> communityCards) {
         List<Card> consideredCards = getOrderedCards( mergeCards( playerCards, communityCards ) );
-        List<Card> spades = new ArrayList<Card>();
+
         List<Card> clubs = new ArrayList<Card>();
-        List<Card> hearts = new ArrayList<Card>();
         List<Card> diamonds = new ArrayList<Card>();
+        List<Card> hearts = new ArrayList<Card>();
+        List<Card> spades = new ArrayList<Card>();
 
         for( Card examine: consideredCards ){
             switch( examine.getSuit() ) {
@@ -103,12 +102,17 @@ public class HandIdentifier {
      * @return List of two pairs of {@link Card}s of the same ranks, or null
      *   if this pattern isn't present.
      */
-    private List<Card> getFourOfAKind( List<Card> playerCards,
-                                   List<Card> communityCards)
-    {
+    private List<Card> getFourOfAKind( List<Card> playerCards, List<Card> communityCards ) {
         List<Card> consideredCards = mergeCards( playerCards, communityCards );
-        List<Card> pairs = getPairwiseCards( 4, consideredCards );
+        List<Card> pairs;
 
+        // means total number of cards submitted to this function is less than 5
+        if( consideredCards.size() < CANDIDATE_COUNT )
+            return null;
+
+        pairs = getPairwiseCards( 4, consideredCards );
+
+        // todo : Possible conversion to simple if statement
         switch( pairs.size() ) {
             case 4: return pairs;
             default:
@@ -126,9 +130,7 @@ public class HandIdentifier {
      * @return List of two pairs of {@link Card}s of the same ranks, or null
      *   if this pattern isn't present.
      */
-    private List<Card> getFullHouse( List<Card> playerCards,
-                                       List<Card> communityCards)
-    {
+    private List<Card> getFullHouse( List<Card> playerCards, List<Card> communityCards ) {
         List<Card> master = null;
         List<Card> temp = new <Card>ArrayList();
         List<Card> threePair = getThreeOfAKind(playerCards, communityCards);
@@ -138,6 +140,11 @@ public class HandIdentifier {
             int x = 0;
 
             temp = mergeCards(playerCards, communityCards);
+
+            // means total number of cards submitted to this function is less than 5
+            //if( temp.size() < CANDIDATE_COUNT )
+            //    return null;
+
             temp.removeAll(threePair);
             twoPair = getOnePair(new <Card>ArrayList(),temp);
 
@@ -165,42 +172,20 @@ public class HandIdentifier {
      * @param communityCards
      * @return The list of the player's top five highest {@link Card}s.
      */
-    public static List<Card> getHighCard( List<Card> playerCards,
-      List<Card> communityCards)
-    {
+    public static List<Card> getHighCard( List<Card> playerCards, List<Card> communityCards) {
       List<Card> consideredCards = getOrderedCards( mergeCards( playerCards, communityCards ) );
       List<Card> master = new ArrayList<Card>();
-
-
-      // OLD ALGORITHM
-      /*
-       * Get first element of the combined cards and iterate all over to know
-       *  which is the highest.
-       */
-      /*
-      Card highCard;
-
-      highCard = consideredCards.get(0);
-      for( int i = 1, j = consideredCards.size(); i<j; i++ ) {
-        Card inProcess = consideredCards.get(i);
-        if( inProcess.getRankInOrdinalOrder() >
-          highCard.getRankInOrdinalOrder()
-        ) {
-          highCard = inProcess;
-        }
-      }
-      return highCard;
-      */
 
       // Get the highest 5, the last should be the highest
       int y = consideredCards.size();
       int x = ( y - 1 ) - 4;
 
-/*      for( Card examine : consideredCards.subList( x, y ) ){
-          master.add( 0, examine );
-      }*/
-        master = consideredCards.subList( x, y );
-        Collections.reverse( master );
+      // means total number of cards submitted to this function is less than 5
+      if( x < 0 )
+          return null;
+
+       master = consideredCards.subList( x, y );
+       Collections.reverse( master );
 
       return master;
     } // end method getHighCard
@@ -213,18 +198,19 @@ public class HandIdentifier {
      * @param communityCards
      * @return List of highest one-pair of card, or null.
      */
-    public static List<Card> getOnePair( List<Card> playerCards,
-      List<Card> communityCards)
-    {
+    public static List<Card> getOnePair( List<Card> playerCards, List<Card> communityCards ) {
       List<Card> consideredCards = mergeCards( playerCards, communityCards );
-      List<Card> pairs = getPairwiseCards( 2, consideredCards );
+      List<Card> pairs = null;
+
+      pairs = getPairwiseCards( 2, consideredCards );
 
       switch( pairs.size() ) {
         case 0: return null;
         case 2: return pairs;
         default:
           // @comment You really won't reach this if getTwoPair (or better)
-          //   was called earlier in the originating function.
+          //   was called earlier in the originating function,
+          //   ceteris paribus.
           List<Card> master = new ArrayList<Card>();
 
           // @ todo: Looks like ripe for a do-while loop instead, or subject
@@ -248,7 +234,11 @@ public class HandIdentifier {
     } // end method getOnePair
 
     /**
-     * Sorts a list of cards by rank.
+     * Sorts a list of cards by rank, in ascending order.
+     *
+     * The order of resulting list is not in what's expected in a Poker Hand.
+     * Example:
+     *   (2,3,4,5,A) , not (A,2,3,4,5)
      *
      * @param toBeSorted
      * @param List of sorted {@link Card}s.
@@ -275,13 +265,9 @@ public class HandIdentifier {
      * @param mergedCards
      * @return List of pairs of {@link Card}s, or empty List if nothing found
      */
-    public static List<Card> getPairwiseCards(
-            Integer pairQuantity,
-            List<Card> mergedCards
-    ) {
-        List<Card> pairwise = new <Card>ArrayList();
+    public static List<Card> getPairwiseCards( Integer pairQuantity, List<Card> mergedCards ) {
         List<Card> master = new <Card>ArrayList();
-        //List<int> skips = new <int>ArrayList();
+        List<Card> pairwise = new <Card>ArrayList();
 
         // @todo: What better algorithm could be rather than O(n^2) ?
         //   - perhaps, iterate and determine ranks first. Put them in a set.
@@ -340,17 +326,18 @@ public class HandIdentifier {
         String comparo = "10,J,Q,K,A";
         String gotten = "";
 
-		try {
-			consideredCards = getStraight(
-				eliminatePossibleDuplicates(playerCards, communityCards),
-				dummyCardList,
-				false
-			);
-		}catch(Exception e){
-			e.printStackTrace();
-		}
+        try {
+            consideredCards = getStraight(
+                    eliminatePossibleDuplicates(playerCards, communityCards),
+                    dummyCardList,
+                    false
+            );
+        }catch(Exception e){
+            e.printStackTrace();
+        }
 
-        if( consideredCards == null )
+        // not even a straight pattern so no point checking the card ranks
+        if( consideredCards == null)
             return null;
 
         gotten = String.format(
@@ -376,14 +363,17 @@ public class HandIdentifier {
      *   if this pattern isn't present.
      */
     // @todo : Can ace be used both ways ( A-2-3-4-5 or 6-7-8-9-A ) ?
-    public static List<Card> getStraight( List<Card> playerCards,
-      List<Card> communityCards, boolean sameSuit) throws Exception
+    public static List<Card> getStraight( List<Card> playerCards, List<Card> communityCards, boolean sameSuit)
+        throws Exception
     {
       List<Card> orderedList = new <Card>ArrayList();
       List<Card> master = new <Card>ArrayList();
       Card previous = null;
       int count = 0;
       int acePosition = -1;
+      int orderedList_size = 0;
+      int orderedListLastIndex = 0;
+      int x = 0;
 
       if( sameSuit ){
        // assumption: getFlush() always returns ordered cards
@@ -396,16 +386,26 @@ public class HandIdentifier {
           );
       }
 
-      // as of making, master is empty
+      // at least five cards should be submitted to this function
+      if( orderedList.size() < CANDIDATE_COUNT )
+          return null;
+
+      // As of making, master is empty - check always if making changes.
       orderedList = eliminatePossibleDuplicates(orderedList, master);
 
       // @todo : Does the compiler optimize : about int = 1, j = list.size()...?
-      int orderedList_size = orderedList.size();
-      int orderedListLastIndex = orderedList_size - 1 ;
-      int x = orderedListLastIndex;
+      // Reminder: orderedList_size is after the pre-processing done
+      orderedList_size = orderedList.size();
+      orderedListLastIndex = orderedList_size - 1 ;
+      x = orderedListLastIndex;
 
       // start of element up to five
       x -= 4;
+
+      // Meaning, remaining eligible cards are now less than 5. Could be
+      //   five at least but remember, we eliminated the duplicates.
+      if( x < 0 )
+          return null;
 
       // check for ace - by default it's in the top always
       if( orderedList.get(orderedListLastIndex).getRank().compareTo( CardRank.ACE ) == 0){
@@ -461,6 +461,8 @@ public class HandIdentifier {
               }
           }
       }else{
+          // No ace present
+
           previous = orderedList.get(x);
           for( x++ ; x < orderedList_size; x++ ) {
              Card examine = orderedList.get(x);
@@ -485,20 +487,7 @@ public class HandIdentifier {
           }
       } // end if-else, no ace present
 
-        // @todo: debugging Remove this on production
-        if( master.size() != 5 ){
-            String vals = "msize=" + master.size() + "|";
-
-            for( Card examine: master ){
-                vals += String.format("(%s,%s),", examine.getRank(), examine.getSuit() );
-            }
-            throw new Exception( "getflush debug " + vals );
-        }else{
-            return master;
-        }
-
-        // @todo: Restore this upon removal of the debugging part before this.
-        //return master.size() == 5 ? master : null;
+       return master.size() == CANDIDATE_COUNT ? master : null;
     } // end method getStraight
 
     /**
@@ -510,9 +499,7 @@ public class HandIdentifier {
      * @return List of three of {@link Card}s of the same ranks, or null
      *   if this pattern isn't present.
      */
-    private List<Card> getThreeOfAKind( List<Card> playerCards,
-      List<Card> communityCards)
-    {
+    private List<Card> getThreeOfAKind( List<Card> playerCards, List<Card> communityCards ) {
       List<Card> consideredCards = mergeCards( playerCards, communityCards );
       List<Card> pairs = getPairwiseCards( 3, consideredCards );
 
@@ -533,9 +520,7 @@ public class HandIdentifier {
      * @return List of two pairs of {@link Card}s of the same ranks, or null
      *   if this pattern isn't present.
      */
-    private List<Card> getTwoPair( List<Card> playerCards,
-      List<Card> communityCards)
-    {
+    private List<Card> getTwoPair( List<Card> playerCards, List<Card> communityCards ) {
       List<Card> consideredCards = mergeCards( playerCards, communityCards );
       List<Card> pairs = getPairwiseCards( 2, consideredCards );
 
@@ -547,8 +532,6 @@ public class HandIdentifier {
       }
     } // end method getTwoPair
 
-
-
     /**
      * Given the player's cards and the community cards, identifies the player's hand.
      *
@@ -556,19 +539,21 @@ public class HandIdentifier {
      * @param communityCards
      * @return The player's {@link Hand} or `null` if no Hand was identified.
      */
-    public Hand identifyHand(List<Card> playerCards, List<Card> communityCards) {
-      Hand theHand = null;
-      List<Card> candidateCards = new <Card>ArrayList();
-      // @comment adsllave here lah //:checkRanking(..) .. check which , then create a pre-supplied class based on it
+    public Hand identifyHand( List<Card> playerCards, List<Card> communityCards ) {
+        List<Card> candidateCards = new <Card>ArrayList();
+        Hand theHand = null;
 
-      // Check if 'Royal Flush'
+        // Check if 'Royal Flush'
         candidateCards = getRoyalFlush(playerCards, communityCards);
 
         if (candidateCards != null) {
-            theHand = new RoyalFlush(candidateCards, candidateCards == null? "null" : "size: " + candidateCards.size() );
+            theHand = new RoyalFlush(
+                candidateCards,
+                candidateCards == null? "null" : "size: " + candidateCards.size()
+            );
         }
 
-      // Check if 'Straight Flush'
+        // Check if 'Straight Flush'
         if( theHand == null ) {
             try {
                 candidateCards = getStraight(playerCards, communityCards, true);
@@ -580,7 +565,7 @@ public class HandIdentifier {
             }
         }
 
-      // Check if 'Four of a Kind'
+        // Check if 'Four of a Kind'
         if( theHand == null ) {
             candidateCards = getFourOfAKind(playerCards, communityCards);
 
@@ -593,7 +578,7 @@ public class HandIdentifier {
             }
         }
 
-      // Check if 'Full House'
+        // Check if 'Full House'
         if( theHand == null ) {
             candidateCards = getFullHouse(playerCards, communityCards);
 
@@ -604,7 +589,7 @@ public class HandIdentifier {
                 );
         }
 
-      // Check if 'Flush'
+        // Check if 'Flush'
         if( theHand == null ) {
             candidateCards = getFlush(playerCards, communityCards);
 
@@ -612,7 +597,7 @@ public class HandIdentifier {
                 theHand = new Flush(candidateCards);
         }
 
-      // Check if 'Straight'
+        // Check if 'Straight'
         if( theHand == null ) {
             try {
                 candidateCards = getStraight(playerCards, communityCards, false);
@@ -624,7 +609,7 @@ public class HandIdentifier {
             }
         }
 
-      // Check if 'Three of a Kind'
+        // Check if 'Three of a Kind'
        if( theHand == null ) {
             candidateCards = getThreeOfAKind(playerCards, communityCards);
 
@@ -638,7 +623,7 @@ public class HandIdentifier {
             }
         }
 
-      // Check if 'Two Pair'
+        // Check if 'Two Pair'
         if( theHand == null ) {
             candidateCards = getTwoPair(playerCards, communityCards);
 
@@ -666,7 +651,7 @@ public class HandIdentifier {
             }
         }
 
-      // Check if 'One Pair'
+        // Check if 'One Pair'
        if( theHand == null ) {
            candidateCards = getOnePair(playerCards, communityCards);
 
@@ -682,32 +667,29 @@ public class HandIdentifier {
 
       // Check if 'High Card'
       if( theHand == null ) {
-          theHand = new HighCard( getHighCard(playerCards, communityCards) );
+          candidateCards = getHighCard(playerCards, communityCards);
+
+          if( candidateCards != null )
+            theHand = new HighCard( candidateCards );
       }
 
       return theHand;
-      // WRONG::::  If reached, nothing eligible for this player
-      //   he always has a high card
-      // candidateCards.removeAll(null);
-      // if( candidateCards.size() == 0)
-      //   return null;
     } // identify Hand
 
     /**
-     *  Merge cards of the player and that of the table's,to be returned as a
-     *    list (too).
+     * Merge two lists of cards to be returned as one new list.
      *
-     * @param playerCards
-     * @param communityCards
-     * @return The List of {@link Card}s.
+     * No sorting or duplicate removal to occur.
+     *
+     * @param set1
+     * @param set2
+     * @return The List of {@link Card}s : set1 appended with set2
      */
-    public static List<Card> mergeCards(
-      List<Card> playerCards, List<Card> communityCards
-    ) {
+    public static List<Card> mergeCards( List<Card> set1, List<Card> set2 ) {
       List<Card> allCards = new <Card>ArrayList();
 
-      allCards.addAll( playerCards );
-      allCards.addAll( communityCards );
+      allCards.addAll( set1 );
+      allCards.addAll( set2 );
 
       return allCards;
     } // end method mergeCards
