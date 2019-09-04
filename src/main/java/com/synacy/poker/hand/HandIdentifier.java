@@ -27,7 +27,7 @@ import static com.synacy.poker.card.CardSuit.*;
 */
 @Component
 public class HandIdentifier {
-    private String this_version = "v0.5.1_main_d20190903-2200";
+    private String this_version = "v0.5.3_main_d20190904-2330";
 
     private static final int CANDIDATE_COUNT = 5;
 
@@ -49,9 +49,11 @@ public class HandIdentifier {
      * Given the player's cards and the community cards, try to identify if
      *   there's a 'Flush Pattern'.
      *
+     * At least five cards of the same pattern/suit should be present.
+     *
      * @param playerCards
      * @param communityCards
-     * @return The list of the player's top five highest {@link Card}s.
+     * @return The list of the {@link Card}s with same suit.
      */
     // @todo : Change the algorithm to maybe use something relating to Perl's
     //   hashes, to reduce variables and if statements.
@@ -133,20 +135,21 @@ public class HandIdentifier {
     private List<Card> getFullHouse( List<Card> playerCards, List<Card> communityCards ) {
         List<Card> master = null;
         List<Card> temp = new <Card>ArrayList();
-        List<Card> threePair = getThreeOfAKind(playerCards, communityCards);
+        List<Card> threePair;
 
+        // means total number of cards submitted to this function is less than 5
+        if( playerCards.size() + communityCards.size() < CANDIDATE_COUNT )
+            return null;
+
+        threePair = getThreeOfAKind(playerCards, communityCards);
         if( threePair != null ){
             List<Card> twoPair;
             int x = 0;
 
             temp = mergeCards(playerCards, communityCards);
 
-            // means total number of cards submitted to this function is less than 5
-            //if( temp.size() < CANDIDATE_COUNT )
-            //    return null;
-
             temp.removeAll(threePair);
-            twoPair = getOnePair(new <Card>ArrayList(),temp);
+            twoPair = getOnePair(new <Card>ArrayList(),temp,false);
 
             if( twoPair == null)
                 return null;
@@ -191,16 +194,29 @@ public class HandIdentifier {
     } // end method getHighCard
 
     /**
+     * @see {@link this.getOnePair(List<Card>, List<Card>, boolean)}
+     */
+    public static List<Card> getOnePair( List<Card> playerCards, List<Card> communityCards ) {
+        return getOnePair( playerCards, communityCards, true );
+    } //end method getOnePair(3)
+
+    /**
      * Given the player's cards and the community cards, try to identify if
      *   there's a one pair pattern.
      *
      * @param playerCards
      * @param communityCards
+     * @param checkMinFiveSize Signifies if we need to enforce requirement of minimum of five cards submitted to this
+     *   function. For some cases, like call from {@link this.getFullHouse()} , this has to be waived.
      * @return List of highest one-pair of card, or null.
      */
-    public static List<Card> getOnePair( List<Card> playerCards, List<Card> communityCards ) {
+
+    public static List<Card> getOnePair( List<Card> playerCards, List<Card> communityCards, boolean checkMinFiveSize ) {
       List<Card> consideredCards = mergeCards( playerCards, communityCards );
       List<Card> pairs = null;
+
+      if( checkMinFiveSize && (consideredCards.size() < CANDIDATE_COUNT ) )
+        return null;
 
       pairs = getPairwiseCards( 2, consideredCards );
 
@@ -499,10 +515,12 @@ public class HandIdentifier {
      * @return List of three of {@link Card}s of the same ranks, or null
      *   if this pattern isn't present.
      */
+    // @todo : Switch to public static
     private List<Card> getThreeOfAKind( List<Card> playerCards, List<Card> communityCards ) {
       List<Card> consideredCards = mergeCards( playerCards, communityCards );
       List<Card> pairs = getPairwiseCards( 3, consideredCards );
 
+      // @todo: Switch to if-statement
       switch( pairs.size() ) {
         case 3: return pairs;
         default:
@@ -520,6 +538,7 @@ public class HandIdentifier {
      * @return List of two pairs of {@link Card}s of the same ranks, or null
      *   if this pattern isn't present.
      */
+    // @todo : Switch to public static
     private List<Card> getTwoPair( List<Card> playerCards, List<Card> communityCards ) {
       List<Card> consideredCards = mergeCards( playerCards, communityCards );
       List<Card> pairs = getPairwiseCards( 2, consideredCards );
@@ -659,10 +678,27 @@ public class HandIdentifier {
             List<Card> otherCards = mergeCards(playerCards, communityCards);
             otherCards.removeAll(candidateCards);
             otherCards=getOrderedCards(otherCards);
-            otherCards.subList(0,2).clear();            // remove lowest two
-            Collections.reverse(otherCards);
-            theHand = new OnePair(candidateCards, otherCards);
-           }
+            try{
+              // @todo: more tests for this.
+              otherCards.subList(0,2).clear();            // remove lowest two
+            }catch(IndexOutOfBoundsException e){
+              String debugMsg = String.format(
+                      "IndexOutOfBoundsException in OnePair Attempt, candidates: %d, others: %d\n",
+                      candidateCards.size(),
+                      otherCards.size()
+               );
+               for( Card examine: candidateCards) {
+                 debugMsg += String.format( "\tCandidates:%s\n", examine );
+               }
+               for( Card examine: otherCards) {
+                 debugMsg += String.format( "\tCardFail:%s\n", examine );
+               }
+               throw new IndexOutOfBoundsException(debugMsg);
+             } // end catch
+
+              Collections.reverse(otherCards);
+              theHand = new OnePair(candidateCards, otherCards);
+            }
        }
 
       // Check if 'High Card'
