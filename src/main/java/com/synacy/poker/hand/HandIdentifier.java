@@ -17,17 +17,11 @@ import static com.synacy.poker.card.CardSuit.*;
 // @todo: Aside from RoyalFlush, check other get functions for eliminatePossibleDuplicates
 /*
   Changelog:
-    @bugfix for get<HandType>() functions, checked if candidate cards
-      count is at least five, else return null.
-    Always call getHighCard if search for higher hands returned null.
-    Minor grammatical changes in comments
-    re-coding like indents and spacing and extending column limit to
-      100 because IntelliJ IDEA defaults to that anyway.
-    Removed obsoleted/commented-out code
+    @bugfix for identifyHand() -- Full House section - the subList-ing part.
 */
 @Component
 public class HandIdentifier {
-    private String this_version = "v0.5.3_main_d20190904-2330";
+    private String this_version = "v0.5.4_main_d20190905-2130";
 
     private static final int CANDIDATE_COUNT = 5;
 
@@ -603,7 +597,7 @@ public class HandIdentifier {
 
             if( candidateCards != null )
                 theHand = new FullHouse(
-                        candidateCards.subList(0,4),
+                        candidateCards.subList(0,3),
                         candidateCards.subList(3,5)
                 );
         }
