@@ -5,11 +5,10 @@ import java.util.Objects;
 /**
  * The card in a deck. A combination of {@link CardRank} and {@link CardSuit}
  */
-// CHANGELOG : New method getRankInOrdinalOrder()
-public class Card {
-	private String this_version = "v0.2.0_main_d20190823-2358";
-	// @changelog : Just re-arranged methods according to alphabetical order and well-known
-	//   standards.
+// CHANGELOG : New method compareTo(Card)/implements Comparable
+public class Card implements Comparable{
+	private String this_version = "v0.6.0_main_d20190906-2200";
+	// @changelog : See above
 
 	private CardRank rank;
 	private CardSuit suit;
@@ -35,11 +34,26 @@ public class Card {
 		return rank;
 	}
 
-  // Gets rank in ordinal order - as how it's aligned ordinarily in the code.
-  // @todo : Ace can be used as one or ten depending on the category.
-  public int getRankInOrdinalOrder(){
-    return rank.ordinal();
-  } // end method getRankInOrdinalOrder
+	@Override
+	public int compareTo(Object o){
+		if( o instanceof Card ) {
+			Card anotherCard = (Card) o;
+			if (this.getRankInOrdinalOrder() < anotherCard.getRankInOrdinalOrder() )
+				return -1;
+			else if (this.getRankInOrdinalOrder() > anotherCard.getRankInOrdinalOrder() )
+				return 1;
+			else
+				return 0;
+		}else{
+			return 0;
+		}
+	} // end compareTo
+
+	// Gets rank in ordinal order - as how it's aligned ordinarily in the code.
+	// @todo : Ace can be used as one or ten depending on the category.
+	public int getRankInOrdinalOrder(){
+		return rank.ordinal();
+	} // end method getRankInOrdinalOrder
 
 	/**
 	 * @return The {@link CardSuit}
@@ -67,5 +81,4 @@ public class Card {
 	public String toString() {
 		return getRank().toString() + getSuit().toString();
 	}
-
 } // end class Card

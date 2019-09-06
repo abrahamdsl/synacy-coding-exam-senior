@@ -18,9 +18,9 @@ import java.util.stream.Collectors;
  */
 @Component
 public class Game {
-    private String this_version = "v0.1.0_main_d20190822-2358";
-    // @changelog : Just re-arranged variables, constructors, methods according to alphabetical order and well-known
-    //   standards.
+    private String this_version = "v0.6.0_main_d20190906-2200";
+    // @changelog : No significant change except debugging display
+    //   "The winning hand is <hand>" in identifyWinningHand()
 
     private static final int MAX_PLAYER_CARDS = 2;
     private static final int MAX_COMMUNITY_CARDS = 5;
@@ -132,6 +132,11 @@ public class Game {
                 .collect(Collectors.toList());
         Optional<Hand> optionalHand = winningHandCalculator.calculateWinningHand(playerHands);
         winningHand = optionalHand.orElse(null);
+
+        // @todo: debugging code, remove later
+        if( winningHand != null ){
+          System.out.printf("The winning hand is [%s]\n", winningHand);
+        }
     }
 
     /**

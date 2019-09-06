@@ -1,6 +1,8 @@
 package com.synacy.poker.hand.types;
 
 import com.synacy.poker.card.Card;
+import com.synacy.poker.card.CardRank;
+import com.synacy.poker.hand.Hand;
 import com.synacy.poker.hand.HandIdentifier;
 import com.synacy.poker.hand.HandType;
 
@@ -10,12 +12,10 @@ import java.util.List;
 /**
  * @see <a href="https://en.wikipedia.org/wiki/List_of_poker_hands#Straight_flush">What is a Straight Flush?</a>
  */
-// @changelog:
-//   Adapted to changes in Straight
-//   External calls to HandIdentifier to determine if it's RoyalFlush
-//     or just this.
+// @changelog: new method getTopRank(), utilisation of latter in .toString(), overhauled .toString(), move most RoyalFlush() functionality to here
+//   like changing getHandType()
 public class StraightFlush extends Straight {
-	private String this_version = "v0.5.0_main_d20190902-2258";
+	private String this_version = "v0.6.0_main_d20190906-2200";
 
     public StraightFlush(List<Card> cards)
     {
@@ -28,8 +28,20 @@ public class StraightFlush extends Straight {
 
     @Override
     public HandType getHandType() {
+      // added: As Royal Flush cards can be declared as a StraightFlush too.
+      if( HandIdentifier.getRoyalFlush( super.getCards(), new ArrayList<Card>() ) != null )
+        return HandType.ROYAL_FLUSH;
+      else
         return HandType.STRAIGHT_FLUSH;
     }
+
+    public CardRank getTopRank(){
+      if( HandIdentifier.getRoyalFlush( super.getCards(), new ArrayList<Card>() ) != null )
+          return CardRank.KING;
+      else
+          //return supra.get( supra.size() - 1 ).getRank();
+          return super.getTopRank();
+    } // end method getTopRank
 
     /**
      * @return Royal Flush if the hand is a royal flush, or Straight Flush with the highest rank card,
@@ -37,25 +49,11 @@ public class StraightFlush extends Straight {
      */
     @Override
     public String toString() {
-        List<Card> supra = super.getCards();
-
-        // added: As Royal Flush cards can be declared as a StraightFlush too.
-        if( HandIdentifier.getRoyalFlush( supra, new ArrayList<Card>() ) != null )
-            return "Royal Flush";
-        else
-            return String.format(
-                    "Straight Flush (%s High)",
-                    supra.get( supra.size() - 1 ).getRank()
-            );
-/*
-        return String.format(
-                "STRAIGHT RF (%s,%s,%s,%s,%s)",
-                getCards().get(0).getRank(),
-                getCards().get(1).getRank(),
-                getCards().get(2).getRank(),
-                getCards().get(3).getRank(),
-                getCards().get(4).getRank()
-        );*/
+      // added: As Royal Flush cards can be declared as a StraightFlush too.
+      if( getHandType() == HandType.ROYAL_FLUSH )
+        return "Royal Flush";
+      else
+        return String.format( "Straight Flush (%s High)", super.getTopRank() );
     }
 
 } // end class StraightFlush

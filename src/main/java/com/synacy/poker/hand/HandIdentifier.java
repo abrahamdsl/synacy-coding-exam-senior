@@ -17,11 +17,18 @@ import static com.synacy.poker.card.CardSuit.*;
 // @todo: Aside from RoyalFlush, check other get functions for eliminatePossibleDuplicates
 /*
   Changelog:
-    @bugfix for identifyHand() -- Full House section - the subList-ing part.
+    New/additional three argument method getHighCard() to make possible creation of a HighCard hand
+      without the minimum-five card check. Useful for tie-breaking in identifying winning hand.
+    Use Card.compareTo() in getOrderedCards
+    getTwoPair() changed to be public static
+    getThreeOfAKind() changed to be public static
+    getFourOfAKind() changed to be public static
+    getFullHouse() changed to be public static
+    in TwoPair in identifyHand, change other cards order to be reversed too
 */
 @Component
 public class HandIdentifier {
-    private String this_version = "v0.5.4_main_d20190905-2130";
+    private String this_version = "v0.6.0_main_d20190906-2200";
 
     private static final int CANDIDATE_COUNT = 5;
 
@@ -98,7 +105,7 @@ public class HandIdentifier {
      * @return List of two pairs of {@link Card}s of the same ranks, or null
      *   if this pattern isn't present.
      */
-    private List<Card> getFourOfAKind( List<Card> playerCards, List<Card> communityCards ) {
+    public static List<Card> getFourOfAKind( List<Card> playerCards, List<Card> communityCards ) {
         List<Card> consideredCards = mergeCards( playerCards, communityCards );
         List<Card> pairs;
 
@@ -126,12 +133,10 @@ public class HandIdentifier {
      * @return List of two pairs of {@link Card}s of the same ranks, or null
      *   if this pattern isn't present.
      */
-    private List<Card> getFullHouse( List<Card> playerCards, List<Card> communityCards ) {
+    public static List<Card> getFullHouse( List<Card> playerCards, List<Card> communityCards ) {
         List<Card> master = null;
-        List<Card> temp = new <Card>ArrayList();
+        List<Card> temp = null;
         List<Card> threePair;
-
-        // means total number of cards submitted to this function is less than 5
         if( playerCards.size() + communityCards.size() < CANDIDATE_COUNT )
             return null;
 
@@ -141,25 +146,29 @@ public class HandIdentifier {
             int x = 0;
 
             temp = mergeCards(playerCards, communityCards);
-
             temp.removeAll(threePair);
-            twoPair = getOnePair(new <Card>ArrayList(),temp,false);
+            twoPair = getOnePair( Collections.emptyList(), temp,false );
 
             if( twoPair == null)
                 return null;
 
             x = twoPair.size();
             if(  x > 0 ) {
-                master = new <Card>ArrayList();
+                master = new <Card>ArrayList(threePair);
 
-                master.addAll(threePair);
                 master.add( twoPair.get(x-2) );
                 master.add( twoPair.get(x-1) );
             }
         }
-
         return master;
     } // end method getFullHouse
+
+    /**
+     * @see {@link this.getHighCard(List<Card>, List<Card>, boolean)}
+     */
+    public static List<Card> getHighCard( List<Card> playerCards, List<Card> communityCards ) {
+        return getHighCard( playerCards, communityCards, true );
+    } //end method getHighCard(2)
 
     /**
      * Given the player's cards and the community cards, try to identify if
@@ -168,8 +177,11 @@ public class HandIdentifier {
      * @param playerCards
      * @param communityCards
      * @return The list of the player's top five highest {@link Card}s.
+    * @param checkMinFiveSize Signifies if we need to enforce requirement of minimum of five cards submitted to this
+     *   function. For some cases, like call from {@link this.getFullHouse()} , this has to be waived.
+     * @return List of highest one-pair of card, or null.
      */
-    public static List<Card> getHighCard( List<Card> playerCards, List<Card> communityCards) {
+    public static List<Card> getHighCard( List<Card> playerCards, List<Card> communityCards, boolean checkMinFiveSize ) {
       List<Card> consideredCards = getOrderedCards( mergeCards( playerCards, communityCards ) );
       List<Card> master = new ArrayList<Card>();
 
@@ -178,14 +190,14 @@ public class HandIdentifier {
       int x = ( y - 1 ) - 4;
 
       // means total number of cards submitted to this function is less than 5
-      if( x < 0 )
+      if( checkMinFiveSize && x < 0 )
           return null;
 
        master = consideredCards.subList( x, y );
        Collections.reverse( master );
 
       return master;
-    } // end method getHighCard
+    } // end method getHighCard(3)
 
     /**
      * @see {@link this.getOnePair(List<Card>, List<Card>, boolean)}
@@ -259,9 +271,7 @@ public class HandIdentifier {
         new Comparator<Card>()
           {
             public int compare(Card first, Card second) {
-              return (
-                first.getRankInOrdinalOrder() < second.getRankInOrdinalOrder()
-              ) ? -1 : 1;
+              return first.compareTo(second);
             }
           }
       );
@@ -510,7 +520,7 @@ public class HandIdentifier {
      *   if this pattern isn't present.
      */
     // @todo : Switch to public static
-    private List<Card> getThreeOfAKind( List<Card> playerCards, List<Card> communityCards ) {
+    public static List<Card> getThreeOfAKind( List<Card> playerCards, List<Card> communityCards ) {
       List<Card> consideredCards = mergeCards( playerCards, communityCards );
       List<Card> pairs = getPairwiseCards( 3, consideredCards );
 
@@ -533,7 +543,7 @@ public class HandIdentifier {
      *   if this pattern isn't present.
      */
     // @todo : Switch to public static
-    private List<Card> getTwoPair( List<Card> playerCards, List<Card> communityCards ) {
+    public static List<Card> getTwoPair( List<Card> playerCards, List<Card> communityCards ) {
       List<Card> consideredCards = mergeCards( playerCards, communityCards );
       List<Card> pairs = getPairwiseCards( 2, consideredCards );
 
@@ -647,6 +657,7 @@ public class HandIdentifier {
                 // not in consideration for the Two Pairs
                 otherCards.removeAll(candidateCards);
                 otherCards = getOrderedCards(otherCards);
+                Collections.reverse(otherCards);
 
                 // sort, returns in ascending order
                 candidateCards = getOrderedCards(candidateCards);
@@ -716,9 +727,8 @@ public class HandIdentifier {
      * @return The List of {@link Card}s : set1 appended with set2
      */
     public static List<Card> mergeCards( List<Card> set1, List<Card> set2 ) {
-      List<Card> allCards = new <Card>ArrayList();
+      List<Card> allCards = new <Card>ArrayList(set1);
 
-      allCards.addAll( set1 );
       allCards.addAll( set2 );
 
       return allCards;
