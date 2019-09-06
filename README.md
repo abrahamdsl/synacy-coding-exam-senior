@@ -1,6 +1,6 @@
 # Texas Hold'em Poker Simulator
 
-this_version = "v0.5.4_main_d20190905-2130";
+this_version = "v0.6.0_main_d20190906-2201";
 
 This exercise is based on the [Texas Hold'em](https://en.wikipedia.org/wiki/Texas_hold_%27em) variant of the Poker card game.
 
